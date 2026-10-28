@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1005722278326",
+    "project_id": "delitrack-462ae",
+    "storage_bucket": "delitrack-462ae.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1005722278326:android:82e6d7f4278743cebbc917",
+        "android_client_info": {
+          "package_name": "com.example.delitrack"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3uWG5TEmmB-jdj7qccYgc-WvU7BpFX4Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
