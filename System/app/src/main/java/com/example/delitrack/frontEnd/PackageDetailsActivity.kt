@@ -29,7 +29,9 @@ class PackageDetailsActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnSave).setOnClickListener {
             Toast.makeText(this, "Package Details Saved! Viewing Route Map", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, RouteMapActivity::class.java)
+            val intent = Intent(this, DashboardActivity::class.java)
+            intent.putExtra("navigate_to", "map")
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
         }
     }

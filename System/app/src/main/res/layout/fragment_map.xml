@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#E5E7E6"
-    android:orientation="vertical"
-    tools:context=".frontEnd.RouteMapActivity">
+    android:orientation="vertical">
 
     <!-- Top Bar -->
     <LinearLayout
@@ -18,19 +15,10 @@
         android:orientation="horizontal"
         android:paddingHorizontal="16dp">
 
-        <TextView
-            android:id="@+id/backBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="←"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center"
             android:orientation="vertical">
 
             <TextView
@@ -48,10 +36,6 @@
                 android:textColor="#666666"
                 android:textSize="12sp" />
         </LinearLayout>
-
-        <View
-            android:layout_width="24dp"
-            android:layout_height="24dp" />
     </LinearLayout>
 
     <!-- OpenStreetMap View -->
@@ -135,3 +119,4 @@
     </LinearLayout>
 
 </LinearLayout>
+

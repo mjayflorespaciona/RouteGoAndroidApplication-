@@ -1,9 +1,9 @@
 package com.example.delitrack.frontEnd
 
-import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.text.InputType
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -13,15 +13,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.delitrack.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class CreateAccountActivity : AppCompatActivity() {
 
     private var selectedRole = "Admin"
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_create_account)
+
+        auth = FirebaseAuth.getInstance()
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -37,8 +42,22 @@ class CreateAccountActivity : AppCompatActivity() {
         val emailField = findViewById<EditText>(R.id.emailField)
         val phoneField = findViewById<EditText>(R.id.phoneField)
         val passwordField = findViewById<EditText>(R.id.passwordField)
+        val togglePasswordBtn = findViewById<TextView>(R.id.togglePasswordBtn)
         val createAccountBtn = findViewById<Button>(R.id.createAccountBtn)
         val signInText = findViewById<TextView>(R.id.signInText)
+
+        var isPasswordVisible = false
+        togglePasswordBtn.setOnClickListener {
+            if (isPasswordVisible) {
+                passwordField.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                togglePasswordBtn.text = "Show"
+            } else {
+                passwordField.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                togglePasswordBtn.text = "Hide"
+            }
+            passwordField.setSelection(passwordField.text.length)
+            isPasswordVisible = !isPasswordVisible
+        }
 
         fun updateRoleSelection(role: String) {
             selectedRole = role
@@ -71,23 +90,38 @@ class CreateAccountActivity : AppCompatActivity() {
 
             if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
-            } else {
-                val prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE)
-                prefs.edit().apply {
-                    putString("name_$email", name)
-                    putString("email_$email", email)
-                    putString("phone_$email", phone)
-                    putString("pass_$email", password)
-                    putString("role_$email", selectedRole)
-                    // Also store by name/username for login flexibility
-                    putString("pass_$name", password)
-                    putString("role_$name", selectedRole)
-                    apply()
-                }
-
-                Toast.makeText(this, "$selectedRole Account Created & Saved Successfully!", Toast.LENGTH_LONG).show()
-                finish()
+                return@setOnClickListener
             }
+
+            createAccountBtn.isEnabled = false
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        val userId = auth.currentUser?.uid ?: email
+                        val db = FirebaseFirestore.getInstance()
+                        val userMap = hashMapOf(
+                            "fullName" to name,
+                            "email" to email,
+                            "phone" to phone,
+                            "role" to selectedRole
+                        )
+                        db.collection("users").document(userId)
+                            .set(userMap)
+                            .addOnSuccessListener {
+                                createAccountBtn.isEnabled = true
+                                Toast.makeText(this, "$selectedRole Account Created & Saved to Firestore!", Toast.LENGTH_LONG).show()
+                                finish()
+                            }
+                            .addOnFailureListener { e ->
+                                createAccountBtn.isEnabled = true
+                                Toast.makeText(this, "Account created, but profile save failed: ${e.message}", Toast.LENGTH_LONG).show()
+                                finish()
+                            }
+                    } else {
+                        createAccountBtn.isEnabled = true
+                        Toast.makeText(this, "Authentication failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
         }
 
         signInText.setOnClickListener {

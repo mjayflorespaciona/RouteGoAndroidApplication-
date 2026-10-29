@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@android:drawable/ic_menu_today"
+        android:title="Home" />
+    <item
+        android:id="@+id/nav_deliveries"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="Deliveries" />
+    <item
+        android:id="@+id/nav_map"
+        android:icon="@android:drawable/ic_menu_mapmode"
+        android:title="Map" />
+    <item
+        android:id="@+id/nav_reports"
+        android:icon="@android:drawable/ic_menu_report_image"
+        android:title="Reports" />
+    <item
+        android:id="@+id/nav_more"
+        android:icon="@android:drawable/ic_menu_more"
+        android:title="More" />
+</menu>
+
