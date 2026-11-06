@@ -23,25 +23,32 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<LinearLayout>(R.id.cardDeliveries).setOnClickListener {
+        view.findViewById<LinearLayout>(R.id.cardDeliveries)?.setOnClickListener {
             (activity as? DashboardActivity)?.selectTab(R.id.nav_deliveries)
         }
 
-        view.findViewById<LinearLayout>(R.id.cardRouteMap).setOnClickListener {
+        view.findViewById<LinearLayout>(R.id.cardRouteMap)?.setOnClickListener {
             (activity as? DashboardActivity)?.selectTab(R.id.nav_map)
         }
 
-        view.findViewById<Button>(R.id.btnNewDelivery).setOnClickListener {
+        view.findViewById<Button>(R.id.btnNewDelivery)?.setOnClickListener {
             startActivity(Intent(requireContext(), NewDeliveryActivity::class.java))
         }
 
-        view.findViewById<TextView>(R.id.viewAllDeliveries).setOnClickListener {
+        view.findViewById<TextView>(R.id.viewAllDeliveries)?.setOnClickListener {
             (activity as? DashboardActivity)?.selectTab(R.id.nav_deliveries)
         }
 
-        view.findViewById<LinearLayout>(R.id.itemDlv1001).setOnClickListener {
+        view.findViewById<LinearLayout>(R.id.itemDlv1001)?.setOnClickListener {
+            startActivity(Intent(requireContext(), DeliveryTrackingActivity::class.java))
+        }
+
+        view.findViewById<LinearLayout>(R.id.itemDlv1002)?.setOnClickListener {
+            startActivity(Intent(requireContext(), AssignRiderVehicleActivity::class.java))
+        }
+
+        view.findViewById<LinearLayout>(R.id.itemDlv1000)?.setOnClickListener {
             startActivity(Intent(requireContext(), DeliveryTrackingActivity::class.java))
         }
     }
 }
-

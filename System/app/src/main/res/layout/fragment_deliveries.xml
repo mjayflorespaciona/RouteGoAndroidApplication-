@@ -41,12 +41,15 @@
 
     <!-- Search Bar -->
     <EditText
+        android:id="@+id/searchField"
         android:layout_width="match_parent"
         android:layout_height="44dp"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp"
         android:background="@android:drawable/editbox_background_normal"
         android:hint="Search deliveries"
+        android:inputType="text"
+        android:autofillHints="name"
         android:paddingHorizontal="12dp"
         android:textSize="14sp" />
 
@@ -59,6 +62,7 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/btnFilterAll"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:backgroundTint="#0B4F2C"
@@ -67,6 +71,7 @@
             android:textSize="12sp" />
 
         <Button
+            android:id="@+id/btnFilterPending"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:layout_marginStart="8dp"
@@ -76,6 +81,7 @@
             android:textSize="12sp" />
 
         <Button
+            android:id="@+id/btnFilterInTransit"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:layout_marginStart="8dp"
@@ -85,6 +91,7 @@
             android:textSize="12sp" />
 
         <Button
+            android:id="@+id/btnFilterDelivered"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:layout_marginStart="8dp"
@@ -97,9 +104,8 @@
     <!-- Delivery Items List -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:layout_marginTop="12dp"
-        android:layout_weight="1"
         android:fillViewport="true">
 
         <LinearLayout
@@ -109,7 +115,7 @@
             android:paddingHorizontal="16dp"
             android:paddingBottom="16dp">
 
-            <!-- DLV-1001 -->
+            <!-- DLV-1001 (In Transit) -->
             <LinearLayout
                 android:id="@+id/itemDlv1001"
                 android:layout_width="match_parent"
@@ -127,6 +133,7 @@
                     android:orientation="horizontal">
 
                     <TextView
+                        android:id="@+id/codeDlv1001"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -135,6 +142,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/statusDlv1001"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="#E0F2FE"
@@ -147,6 +155,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/routeDlv1001"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
@@ -163,7 +172,7 @@
                     android:textSize="11sp" />
             </LinearLayout>
 
-            <!-- DLV-1002 -->
+            <!-- DLV-1002 (Pending) -->
             <LinearLayout
                 android:id="@+id/itemDlv1002"
                 android:layout_width="match_parent"
@@ -181,6 +190,7 @@
                     android:orientation="horizontal">
 
                     <TextView
+                        android:id="@+id/codeDlv1002"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -189,6 +199,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/statusDlv1002"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="#FEF3C7"
@@ -201,6 +212,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/routeDlv1002"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
@@ -217,7 +229,7 @@
                     android:textSize="11sp" />
             </LinearLayout>
 
-            <!-- DLV-1003 -->
+            <!-- DLV-1003 (Pending) -->
             <LinearLayout
                 android:id="@+id/itemDlv1003"
                 android:layout_width="match_parent"
@@ -235,6 +247,7 @@
                     android:orientation="horizontal">
 
                     <TextView
+                        android:id="@+id/codeDlv1003"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -243,6 +256,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/statusDlv1003"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="#FEF3C7"
@@ -255,6 +269,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/routeDlv1003"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
@@ -271,7 +286,7 @@
                     android:textSize="11sp" />
             </LinearLayout>
 
-            <!-- DLV-1000 -->
+            <!-- DLV-1000 (Delivered) -->
             <LinearLayout
                 android:id="@+id/itemDlv1000"
                 android:layout_width="match_parent"
@@ -289,6 +304,7 @@
                     android:orientation="horizontal">
 
                     <TextView
+                        android:id="@+id/codeDlv1000"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -297,6 +313,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/statusDlv1000"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="#DCFCE7"
@@ -309,6 +326,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/routeDlv1000"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
@@ -329,4 +347,3 @@
     </ScrollView>
 
 </LinearLayout>
-
