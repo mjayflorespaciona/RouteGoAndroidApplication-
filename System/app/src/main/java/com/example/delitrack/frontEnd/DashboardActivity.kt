@@ -32,7 +32,6 @@ class DashboardActivity : AppCompatActivity() {
                 R.id.nav_home -> HomeFragment()
                 R.id.nav_deliveries -> DeliveriesFragment()
                 R.id.nav_map -> MapFragment()
-                R.id.nav_reports -> ReportsFragment()
                 R.id.nav_more -> MoreFragment()
                 else -> HomeFragment()
             }
@@ -47,7 +46,6 @@ class DashboardActivity : AppCompatActivity() {
             bottomNavigation.selectedItemId = when (navigateTo) {
                 "deliveries" -> R.id.nav_deliveries
                 "map" -> R.id.nav_map
-                "reports" -> R.id.nav_reports
                 "more" -> R.id.nav_more
                 else -> R.id.nav_home
             }
@@ -61,7 +59,6 @@ class DashboardActivity : AppCompatActivity() {
             bottomNavigation.selectedItemId = when (navigateTo) {
                 "deliveries" -> R.id.nav_deliveries
                 "map" -> R.id.nav_map
-                "reports" -> R.id.nav_reports
                 "more" -> R.id.nav_more
                 else -> R.id.nav_home
             }

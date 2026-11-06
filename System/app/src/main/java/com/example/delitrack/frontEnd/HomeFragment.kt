@@ -23,6 +23,32 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Metrics Click Listeners
+        view.findViewById<LinearLayout>(R.id.cardTotalRiders)?.setOnClickListener {
+            startActivity(Intent(requireContext(), AssignRiderVehicleActivity::class.java))
+        }
+
+        view.findViewById<LinearLayout>(R.id.cardTotalVehicles)?.setOnClickListener {
+            startActivity(Intent(requireContext(), AssignRiderVehicleActivity::class.java))
+        }
+
+        view.findViewById<LinearLayout>(R.id.cardActiveRiders)?.setOnClickListener {
+            startActivity(Intent(requireContext(), AssignRiderVehicleActivity::class.java))
+        }
+
+        view.findViewById<LinearLayout>(R.id.cardAvailableRiders)?.setOnClickListener {
+            startActivity(Intent(requireContext(), AssignRiderVehicleActivity::class.java))
+        }
+
+        view.findViewById<LinearLayout>(R.id.cardTotalDeliveries)?.setOnClickListener {
+            (activity as? DashboardActivity)?.selectTab(R.id.nav_deliveries)
+        }
+
+        view.findViewById<LinearLayout>(R.id.cardPendingDeliveries)?.setOnClickListener {
+            (activity as? DashboardActivity)?.selectTab(R.id.nav_deliveries)
+        }
+
+        // Action Cards & Buttons
         view.findViewById<LinearLayout>(R.id.cardDeliveries)?.setOnClickListener {
             (activity as? DashboardActivity)?.selectTab(R.id.nav_deliveries)
         }

@@ -42,9 +42,6 @@
             android:name=".frontEnd.AssignRiderVehicleActivity"
             android:exported="false" />
         <activity
-            android:name=".frontEnd.PackageDetailsActivity"
-            android:exported="false" />
-        <activity
             android:name=".frontEnd.DeliveryTrackingActivity"
             android:exported="false" />
     </application>

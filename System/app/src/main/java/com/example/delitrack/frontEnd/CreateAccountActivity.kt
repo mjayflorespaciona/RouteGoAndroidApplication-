@@ -1,7 +1,5 @@
 package com.example.delitrack.frontEnd
 
-import android.graphics.Color
-import android.graphics.Typeface
 import android.os.Bundle
 import android.text.InputType
 import android.widget.Button
@@ -18,7 +16,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class CreateAccountActivity : AppCompatActivity() {
 
-    private var selectedRole = "Admin"
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,10 +30,6 @@ class CreateAccountActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-        val roleAdminBtn = findViewById<Button>(R.id.roleAdminBtn)
-        val roleDispatcherBtn = findViewById<Button>(R.id.roleDispatcherBtn)
-        val roleRiderBtn = findViewById<Button>(R.id.roleRiderBtn)
 
         val fullNameField = findViewById<EditText>(R.id.fullNameField)
         val emailField = findViewById<EditText>(R.id.emailField)
@@ -59,29 +52,6 @@ class CreateAccountActivity : AppCompatActivity() {
             isPasswordVisible = !isPasswordVisible
         }
 
-        fun updateRoleSelection(role: String) {
-            selectedRole = role
-            val activeColor = Color.parseColor("#0B4F2C")
-            val activeTextColor = Color.WHITE
-            val inactiveTextColor = Color.parseColor("#666666")
-
-            roleAdminBtn.setBackgroundColor(if (role == "Admin") activeColor else Color.TRANSPARENT)
-            roleAdminBtn.setTextColor(if (role == "Admin") activeTextColor else inactiveTextColor)
-            roleAdminBtn.setTypeface(null, if (role == "Admin") Typeface.BOLD else Typeface.NORMAL)
-
-            roleDispatcherBtn.setBackgroundColor(if (role == "Dispatcher") activeColor else Color.TRANSPARENT)
-            roleDispatcherBtn.setTextColor(if (role == "Dispatcher") activeTextColor else inactiveTextColor)
-            roleDispatcherBtn.setTypeface(null, if (role == "Dispatcher") Typeface.BOLD else Typeface.NORMAL)
-
-            roleRiderBtn.setBackgroundColor(if (role == "Rider") activeColor else Color.TRANSPARENT)
-            roleRiderBtn.setTextColor(if (role == "Rider") activeTextColor else inactiveTextColor)
-            roleRiderBtn.setTypeface(null, if (role == "Rider") Typeface.BOLD else Typeface.NORMAL)
-        }
-
-        roleAdminBtn.setOnClickListener { updateRoleSelection("Admin") }
-        roleDispatcherBtn.setOnClickListener { updateRoleSelection("Dispatcher") }
-        roleRiderBtn.setOnClickListener { updateRoleSelection("Rider") }
-
         createAccountBtn.setOnClickListener {
             val name = fullNameField.text.toString().trim()
             val email = emailField.text.toString().trim()
@@ -103,13 +73,13 @@ class CreateAccountActivity : AppCompatActivity() {
                             "fullName" to name,
                             "email" to email,
                             "phone" to phone,
-                            "role" to selectedRole
+                            "role" to "Customer"
                         )
                         db.collection("users").document(userId)
                             .set(userMap)
                             .addOnSuccessListener {
                                 createAccountBtn.isEnabled = true
-                                Toast.makeText(this, "$selectedRole Account Created & Saved to Firestore!", Toast.LENGTH_LONG).show()
+                                Toast.makeText(this, "Customer Account Registered Successfully!", Toast.LENGTH_LONG).show()
                                 finish()
                             }
                             .addOnFailureListener { e ->
@@ -119,7 +89,7 @@ class CreateAccountActivity : AppCompatActivity() {
                             }
                     } else {
                         createAccountBtn.isEnabled = true
-                        Toast.makeText(this, "Authentication failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Registration failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                     }
                 }
         }

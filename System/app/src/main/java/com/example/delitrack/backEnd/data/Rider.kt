@@ -1,8 +1,9 @@
 package com.example.delitrack.backEnd.data
 
-data class  Rider(
+data class Rider(
     val riderId: String,
-    val name: String,
-    val phone: String,
-    val isAvailable: Boolean = true
+    var fullName: String,
+    var phone: String,
+    var assignedVehicleId: String? = null,
+    var status: String = "Available" // "Active", "Available", "Offline"
 )

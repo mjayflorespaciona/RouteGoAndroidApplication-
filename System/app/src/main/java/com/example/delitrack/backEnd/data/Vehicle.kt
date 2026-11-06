@@ -2,7 +2,8 @@ package com.example.delitrack.backEnd.data
 
 data class Vehicle(
     val vehicleId: String,
-    val plateNumber: String,
-    val vehicleType: String, // e.g. "Delivery Van", "Motorcycle"
-    val assignedRiderId: String? = null
+    var plateNumber: String,
+    var vehicleType: String, // "Motorcycle", "Delivery Van"
+    var assignedRiderId: String? = null,
+    var status: String = "Available" // "Assigned", "Available"
 )

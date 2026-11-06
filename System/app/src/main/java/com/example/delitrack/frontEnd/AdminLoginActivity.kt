@@ -25,8 +25,8 @@ class AdminLoginActivity : AppCompatActivity() {
         val loginPassField = findViewById<EditText>(R.id.loginPassField)
         val signInBtn = findViewById<Button>(R.id.signInBtn)
         val errorBarLabel = findViewById<TextView>(R.id.errorBarLabel)
-        val signUpPrompt = findViewById<TextView>(R.id.signUpPrompt)
         val forgotPasswordText = findViewById<TextView>(R.id.forgotPasswordText)
+        val signUpPrompt = findViewById<TextView>(R.id.signUpPrompt)
         val togglePasswordBtn = findViewById<TextView>(R.id.togglePasswordBtn)
 
         var isPasswordVisible = false
@@ -69,7 +69,7 @@ class AdminLoginActivity : AppCompatActivity() {
                     signInBtn.isEnabled = true
                     if (task.isSuccessful) {
                         errorBarLabel.visibility = View.GONE
-                        Toast.makeText(this, "Firebase Login Successful!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Sign-in Successful!", Toast.LENGTH_SHORT).show()
                         val intent = Intent(this, DashboardActivity::class.java)
                         startActivity(intent)
                         finish()
@@ -100,8 +100,7 @@ class AdminLoginActivity : AppCompatActivity() {
         }
 
         signUpPrompt.setOnClickListener {
-            val intent = Intent(this, CreateAccountActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, CreateAccountActivity::class.java))
         }
     }
 }

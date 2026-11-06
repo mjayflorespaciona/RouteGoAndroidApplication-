@@ -7,18 +7,13 @@
     <item
         android:id="@+id/nav_deliveries"
         android:icon="@android:drawable/ic_menu_agenda"
-        android:title="Deliveries" />
+        android:title="My Deliveries" />
     <item
         android:id="@+id/nav_map"
         android:icon="@android:drawable/ic_menu_mapmode"
-        android:title="Map" />
-    <item
-        android:id="@+id/nav_reports"
-        android:icon="@android:drawable/ic_menu_report_image"
-        android:title="Reports" />
+        android:title="Track Package" />
     <item
         android:id="@+id/nav_more"
-        android:icon="@android:drawable/ic_menu_more"
-        android:title="More" />
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="Profile" />
 </menu>
-
