@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:background="@android:drawable/dialog_holo_light_frame"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvDeliveryId"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="DLV-1001"
+            android:textColor="#111111"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvDeliveryStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#E0F2FE"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:text="In Transit"
+            android:textColor="#0284C7"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvDeliveryRoute"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Nasugbu ➔ Lian"
+        android:textColor="#555555"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/tvDeliveryDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Today, 08:45 AM"
+        android:textColor="#888888"
+        android:textSize="11sp" />
+</LinearLayout>
