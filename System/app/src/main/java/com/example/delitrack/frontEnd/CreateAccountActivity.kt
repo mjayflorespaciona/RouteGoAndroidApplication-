@@ -1,5 +1,6 @@
 package com.example.delitrack.frontEnd
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.widget.Button
@@ -35,7 +36,9 @@ class CreateAccountActivity : AppCompatActivity() {
         val emailField = findViewById<EditText>(R.id.emailField)
         val phoneField = findViewById<EditText>(R.id.phoneField)
         val passwordField = findViewById<EditText>(R.id.passwordField)
+        val confirmPasswordField = findViewById<EditText>(R.id.confirmPasswordField)
         val togglePasswordBtn = findViewById<TextView>(R.id.togglePasswordBtn)
+        val toggleConfirmPasswordBtn = findViewById<TextView>(R.id.toggleConfirmPasswordBtn)
         val createAccountBtn = findViewById<Button>(R.id.createAccountBtn)
         val signInText = findViewById<TextView>(R.id.signInText)
 
@@ -52,14 +55,38 @@ class CreateAccountActivity : AppCompatActivity() {
             isPasswordVisible = !isPasswordVisible
         }
 
+        var isConfirmPasswordVisible = false
+        toggleConfirmPasswordBtn.setOnClickListener {
+            if (isConfirmPasswordVisible) {
+                confirmPasswordField.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                toggleConfirmPasswordBtn.text = "Show"
+            } else {
+                confirmPasswordField.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                toggleConfirmPasswordBtn.text = "Hide"
+            }
+            confirmPasswordField.setSelection(confirmPasswordField.text.length)
+            isConfirmPasswordVisible = !isConfirmPasswordVisible
+        }
+
         createAccountBtn.setOnClickListener {
             val name = fullNameField.text.toString().trim()
             val email = emailField.text.toString().trim()
             val phone = phoneField.text.toString().trim()
             val password = passwordField.text.toString().trim()
+            val confirmPassword = confirmPasswordField.text.toString().trim()
 
-            if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+                Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (password != confirmPassword) {
+                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (password.length < 6) {
+                Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -69,6 +96,7 @@ class CreateAccountActivity : AppCompatActivity() {
                     if (task.isSuccessful) {
                         val userId = auth.currentUser?.uid ?: email
                         val db = FirebaseFirestore.getInstance()
+                        // Automatically assign Customer role (never allow registering as Admin)
                         val userMap = hashMapOf(
                             "fullName" to name,
                             "email" to email,
@@ -79,12 +107,18 @@ class CreateAccountActivity : AppCompatActivity() {
                             .set(userMap)
                             .addOnSuccessListener {
                                 createAccountBtn.isEnabled = true
-                                Toast.makeText(this, "Customer Account Registered Successfully!", Toast.LENGTH_LONG).show()
+                                Toast.makeText(this, "Customer Account Created Successfully!", Toast.LENGTH_LONG).show()
+                                val intent = Intent(this, DashboardActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                startActivity(intent)
                                 finish()
                             }
                             .addOnFailureListener { e ->
                                 createAccountBtn.isEnabled = true
                                 Toast.makeText(this, "Account created, but profile save failed: ${e.message}", Toast.LENGTH_LONG).show()
+                                val intent = Intent(this, DashboardActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                startActivity(intent)
                                 finish()
                             }
                     } else {

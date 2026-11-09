@@ -12,8 +12,11 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.delitrack.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class DeliveriesFragment : Fragment() {
 
@@ -25,11 +28,9 @@ class DeliveriesFragment : Fragment() {
     private lateinit var btnFilterInTransit: Button
     private lateinit var btnFilterDelivered: Button
     private lateinit var searchField: EditText
+    private lateinit var containerDeliveriesList: LinearLayout
 
-    private lateinit var item1001: LinearLayout
-    private lateinit var item1002: LinearLayout
-    private lateinit var item1003: LinearLayout
-    private lateinit var item1000: LinearLayout
+    private val allDeliveries = mutableListOf<Map<String, Any>>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,27 +47,7 @@ class DeliveriesFragment : Fragment() {
         btnFilterInTransit = view.findViewById(R.id.btnFilterInTransit)
         btnFilterDelivered = view.findViewById(R.id.btnFilterDelivered)
         searchField = view.findViewById(R.id.searchField)
-
-        item1001 = view.findViewById(R.id.itemDlv1001)
-        item1002 = view.findViewById(R.id.itemDlv1002)
-        item1003 = view.findViewById(R.id.itemDlv1003)
-        item1000 = view.findViewById(R.id.itemDlv1000)
-
-        item1001.setOnClickListener {
-            startActivity(Intent(requireContext(), AssignRiderVehicleActivity::class.java))
-        }
-
-        item1002.setOnClickListener {
-            startActivity(Intent(requireContext(), AssignRiderVehicleActivity::class.java))
-        }
-
-        item1003.setOnClickListener {
-            startActivity(Intent(requireContext(), AssignRiderVehicleActivity::class.java))
-        }
-
-        item1000.setOnClickListener {
-            startActivity(Intent(requireContext(), DeliveryTrackingActivity::class.java))
-        }
+        containerDeliveriesList = view.findViewById(R.id.containerDeliveriesList)
 
         btnFilterAll.setOnClickListener { setFilter("All") }
         btnFilterPending.setOnClickListener { setFilter("Pending") }
@@ -77,16 +58,18 @@ class DeliveriesFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 searchQuery = s?.toString()?.trim() ?: ""
-                applyFilterAndSearch()
+                renderDeliveries()
             }
             override fun afterTextChanged(s: Editable?) {}
         })
+
+        loadDeliveries()
     }
 
     private fun setFilter(filter: String) {
         currentFilter = filter
         updateFilterButtonStyles()
-        applyFilterAndSearch()
+        renderDeliveries()
     }
 
     private fun updateFilterButtonStyles() {
@@ -108,21 +91,114 @@ class DeliveriesFragment : Fragment() {
         btnFilterDelivered.setTextColor(if (currentFilter == "Delivered") activeText else inactiveText)
     }
 
-    private fun applyFilterAndSearch() {
-        val match1001 = (currentFilter == "All" || currentFilter == "In Transit") &&
-                (searchQuery.isEmpty() || "dlv-1001 nasugbu lian in transit".contains(searchQuery.lowercase()))
-        item1001.visibility = if (match1001) View.VISIBLE else View.GONE
+    private fun loadDeliveries() {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val userId = currentUser?.uid ?: "default_customer"
+        val db = FirebaseFirestore.getInstance()
 
-        val match1002 = (currentFilter == "All" || currentFilter == "Pending") &&
-                (searchQuery.isEmpty() || "dlv-1002 nasugbu lian pending".contains(searchQuery.lowercase()))
-        item1002.visibility = if (match1002) View.VISIBLE else View.GONE
+        db.collection("deliveries")
+            .get()
+            .addOnSuccessListener { result ->
+                if (!isAdded) return@addOnSuccessListener
+                allDeliveries.clear()
 
-        val match1003 = (currentFilter == "All" || currentFilter == "Pending") &&
-                (searchQuery.isEmpty() || "dlv-1003 nasugbu lian pending".contains(searchQuery.lowercase()))
-        item1003.visibility = if (match1003) View.VISIBLE else View.GONE
+                for (document in result) {
+                    val data = document.data
+                    val custId = data["customerId"] as? String ?: ""
+                    if (custId.isEmpty() || custId == userId || currentUser?.email == "admin@delitrack.com") {
+                        allDeliveries.add(data)
+                    }
+                }
+                renderDeliveries()
+            }
+            .addOnFailureListener {
+                // handle failure
+            }
+    }
 
-        val match1000 = (currentFilter == "All" || currentFilter == "Delivered") &&
-                (searchQuery.isEmpty() || "dlv-1000 nasugbu lian delivered".contains(searchQuery.lowercase()))
-        item1000.visibility = if (match1000) View.VISIBLE else View.GONE
+    private fun renderDeliveries() {
+        if (!isAdded) return
+        containerDeliveriesList.removeAllViews()
+
+        val filtered = allDeliveries.filter { data ->
+            val status = data["status"] as? String ?: "Pending"
+            val deliveryId = (data["deliveryId"] as? String ?: "").lowercase()
+            val pickup = (data["pickupAddress"] as? String ?: "").lowercase()
+            val dest = (data["destination"] as? String ?: "").lowercase()
+            val customer = (data["customerName"] as? String ?: "").lowercase()
+
+            val matchesFilter = when (currentFilter) {
+                "All" -> true
+                "Pending" -> status.equals("Pending", ignoreCase = true)
+                "In Transit" -> status.equals("In Transit", ignoreCase = true) || status.equals("Dispatched", ignoreCase = true) || status.equals("Active", ignoreCase = true)
+                "Delivered" -> status.equals("Delivered", ignoreCase = true) || status.equals("Completed", ignoreCase = true)
+                else -> true
+            }
+
+            val matchesSearch = searchQuery.isEmpty() ||
+                    deliveryId.contains(searchQuery.lowercase()) ||
+                    pickup.contains(searchQuery.lowercase()) ||
+                    dest.contains(searchQuery.lowercase()) ||
+                    customer.contains(searchQuery.lowercase()) ||
+                    status.contains(searchQuery.lowercase())
+
+            matchesFilter && matchesSearch
+        }
+
+        if (filtered.isEmpty()) {
+            val emptyTv = TextView(requireContext()).apply {
+                text = "No deliveries match your filter or search."
+                setPadding(16, 32, 16, 16)
+                setTextColor(resources.getColor(android.R.color.darker_gray, null))
+            }
+            containerDeliveriesList.addView(emptyTv)
+            return
+        }
+
+        for (data in filtered) {
+            val deliveryId = data["deliveryId"] as? String ?: "DLV-XXXX"
+            val status = data["status"] as? String ?: "Pending"
+            val pickup = data["pickupAddress"] as? String ?: "Nasugbu"
+            val dest = data["destination"] as? String ?: "Lian"
+            val date = data["dateCreated"] as? String ?: "Today"
+
+            val cardView = layoutInflater.inflate(R.layout.item_delivery_card_snippet, containerDeliveriesList, false) as? LinearLayout
+            if (cardView != null) {
+                cardView.findViewById<TextView>(R.id.tvDeliveryId)?.text = deliveryId
+                val tvStatus = cardView.findViewById<TextView>(R.id.tvDeliveryStatus)
+                tvStatus?.text = status
+
+                when (status.lowercase()) {
+                    "in transit", "dispatched", "active" -> {
+                        tvStatus?.setBackgroundColor(0xFFE0F2FE.toInt())
+                        tvStatus?.setTextColor(0xFF0284C7.toInt())
+                    }
+                    "pending" -> {
+                        tvStatus?.setBackgroundColor(0xFFFEF3C7.toInt())
+                        tvStatus?.setTextColor(0xFFD97706.toInt())
+                    }
+                    "delivered", "completed" -> {
+                        tvStatus?.setBackgroundColor(0xFFDCFCE7.toInt())
+                        tvStatus?.setTextColor(0xFF16A34A.toInt())
+                    }
+                }
+
+                cardView.findViewById<TextView>(R.id.tvDeliveryRoute)?.text = "$pickup ➔ $dest"
+                cardView.findViewById<TextView>(R.id.tvDeliveryDate)?.text = date
+
+                cardView.setOnClickListener {
+                    val intent = Intent(requireContext(), DeliveryTrackingActivity::class.java)
+                    intent.putExtra("deliveryId", deliveryId)
+                    startActivity(intent)
+                }
+
+                containerDeliveriesList.addView(cardView)
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadDeliveries()
     }
 }

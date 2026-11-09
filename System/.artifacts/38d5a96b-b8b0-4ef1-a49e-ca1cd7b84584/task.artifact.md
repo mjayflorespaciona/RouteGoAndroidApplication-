@@ -1,0 +1,3 @@
+- [/] Task 1: Update activity_create_account.xml to add Confirm Password field
+- [ ] Task 2: Update CreateAccountActivity.kt with confirm password validation, customer role assignment, and success handling
+- [ ] Task 3: Update AdminLoginActivity.kt and activity_admin_login.xml for RoutGo customer login screen branding and functionality

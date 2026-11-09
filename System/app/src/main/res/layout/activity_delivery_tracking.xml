@@ -22,6 +22,9 @@
             android:id="@+id/backBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp"
             android:text="←"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -42,6 +45,7 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tvTrackingId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="DLV-1001"
@@ -66,8 +70,9 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Status Badge Header -->
+            <!-- Status Badge Header (Supports 5 Statuses: Pending, Confirmed, Assigned to Rider, In Transit, Delivered) -->
             <TextView
+                android:id="@+id/tvTrackingStatus"
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:background="#E0F2FE"
@@ -119,6 +124,7 @@
                             android:textSize="11sp" />
 
                         <TextView
+                            android:id="@+id/tvPickupAddress"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Nasugbu, Batangas"
@@ -153,6 +159,7 @@
                             android:textSize="11sp" />
 
                         <TextView
+                            android:id="@+id/tvDestinationAddress"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Lian, Batangas"
@@ -187,6 +194,7 @@
                             android:textSize="11sp" />
 
                         <TextView
+                            android:id="@+id/tvCustomerInfo"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Juan Dela Cruz\n0917 555 1234"
@@ -337,7 +345,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="45 min remaining"
+            android:text="Nasugbu ➔ Lian Route"
             android:textColor="#0B4F2C"
             android:textStyle="bold" />
     </LinearLayout>
