@@ -1,43 +1,44 @@
 # RoutGo Customer Login and Registration Implementation Plan
 
-Improve and update the existing authentication activities (`AdminLoginActivity.kt` / login screen, `CreateAccountActivity.kt` / registration screen, and their layout XMLs) to meet all RoutGo customer login and registration requirements.
+Improve and update `AdminLoginActivity.kt`, `CreateAccountActivity.kt`, `activity_admin_login.xml`, and `activity_create_account.xml` to meet all RoutGo customer login and registration requirements.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> - Ensure Registration screen includes **Confirm Password** field with validation matching the password.
-> - Automatically assign `role: "Customer"` in Firestore `users` collection upon registration and prevent any admin registration.
-> - Redirect successful customers to the Customer Dashboard (`DashboardActivity`).
+> - Registration screen will be updated to include the **Confirm Password** field (`confirmPasswordField`) with password matching validation.
+> - Newly registered accounts will automatically receive `role: "Customer"` in Firestore, strictly prohibiting admin registration.
+> - Authenticated customers will be redirected to the Customer Dashboard (`DashboardActivity`).
 
 ## Proposed Changes
 
-### Login Screen
+### Login Screen UI & Logic
+
 #### [MODIFY] [activity_admin_login.xml](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/res/layout/activity_admin_login.xml)
-- Update title/branding to "RoutGo Customer Login" / logo.
-- Ensure Email input field, Password input field, show/hide password toggle, login button, forgot password link, and create account link are fully functional and cleanly styled.
+- Ensure RoutGo logo and application title are clearly visible.
+- Provide Email input field (`loginUserField`), Password input field (`loginPassField`), show/hide password toggle (`togglePasswordBtn`), Sign In button (`signInBtn`), Forgot Password link (`forgotPasswordText`), and Create Account link (`signUpPrompt`).
 
 #### [MODIFY] [AdminLoginActivity.kt](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/java/com/example/delitrack/frontEnd/AdminLoginActivity.kt)
-- Validate email and password inputs.
-- Authenticate with Firebase Auth and verify user role or redirect successfully to `DashboardActivity`.
-- Prevent customer accounts from accessing admin-only functions.
+- Validate email and password inputs before submission.
+- Authenticate with Firebase Auth and check user role in Firestore.
+- Redirect successful customers to `DashboardActivity` while enforcing role-based access control.
 
-### Registration Screen
+### Registration Screen UI & Logic
+
 #### [MODIFY] [activity_create_account.xml](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/res/layout/activity_create_account.xml)
-- Add **Confirm Password** input field (`confirmPasswordField`) and toggle show/hide.
-- Ensure Full Name, Email Address, Contact Number, Password, Confirm Password, Register button, and Back to Login link (`signInText`) are present and styled cleanly.
+- Add **Confirm Password** field (`confirmPasswordField`) and show/hide password toggle (`toggleConfirmPasswordBtn`).
+- Maintain Full Name (`fullNameField`), Email Address (`emailField`), Contact Number (`phoneField`), Password (`passwordField`), Register button (`createAccountBtn`), and Back to Login link (`signInText`).
 
 #### [MODIFY] [CreateAccountActivity.kt](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/java/com/example/delitrack/frontEnd/CreateAccountActivity.kt)
-- Validate all required fields including password matching confirm password.
-- Register user in Firebase Auth.
-- Automatically assign `role: "Customer"` in Firestore `users` collection.
-- Prevent any attempt to register as ADMIN.
-- Redirect on success to Dashboard.
+- Add comprehensive validation for required fields, ensuring password matches confirm password.
+- Create user in Firebase Auth and save user profile in Firestore `users` collection with `role: "Customer"`.
+- Strictly prohibit registering as Admin.
+- Redirect successful registration directly to `DashboardActivity`.
 
 ## Verification Plan
 
 ### Automated Tests
-- Code inspection and verification of inputs and validations.
+- Run Gradle build (`app:assembleDebug`) to verify clean compilation.
 
 ### Manual Verification
-- Test login with customer credentials and default admin.
-- Test registration with new customer account (verifying confirm password validation and automatic customer role assignment in Firestore).
+- Test customer registration with valid fields and password matching.
+- Test login flow with customer credentials and verify redirection to Customer Dashboard.
