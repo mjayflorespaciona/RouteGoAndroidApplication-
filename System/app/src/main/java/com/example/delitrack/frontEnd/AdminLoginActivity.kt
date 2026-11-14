@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.delitrack.R
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class AdminLoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -47,7 +48,7 @@ class AdminLoginActivity : AppCompatActivity() {
             val password = loginPassField.text.toString().trim()
 
             if (usernameOrEmail.isEmpty() || password.isEmpty()) {
-                errorBarLabel.text = "Please enter email/username and password"
+                errorBarLabel.text = "Please enter email address and password"
                 errorBarLabel.visibility = View.VISIBLE
                 return@setOnClickListener
             }
@@ -56,8 +57,9 @@ class AdminLoginActivity : AppCompatActivity() {
 
             if (isDefaultAdmin) {
                 errorBarLabel.visibility = View.GONE
-                Toast.makeText(this, "Login Successful (Default Admin)!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Login Successful (Admin)!", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, DashboardActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
                 finish()
                 return@setOnClickListener
@@ -69,10 +71,33 @@ class AdminLoginActivity : AppCompatActivity() {
                     signInBtn.isEnabled = true
                     if (task.isSuccessful) {
                         errorBarLabel.visibility = View.GONE
-                        Toast.makeText(this, "Sign-in Successful!", Toast.LENGTH_SHORT).show()
-                        val intent = Intent(this, DashboardActivity::class.java)
-                        startActivity(intent)
-                        finish()
+                        val userId = auth.currentUser?.uid
+                        if (userId != null) {
+                            val db = FirebaseFirestore.getInstance()
+                            db.collection("users").document(userId)
+                                .get()
+                                .addOnSuccessListener { document ->
+                                    val role = document.getString("role") ?: "Customer"
+                                    Toast.makeText(this, "Login Successful ($role)!", Toast.LENGTH_SHORT).show()
+                                    val intent = Intent(this, DashboardActivity::class.java)
+                                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    startActivity(intent)
+                                    finish()
+                                }
+                                .addOnFailureListener {
+                                    Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
+                                    val intent = Intent(this, DashboardActivity::class.java)
+                                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    startActivity(intent)
+                                    finish()
+                                }
+                        } else {
+                            Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
+                            val intent = Intent(this, DashboardActivity::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            startActivity(intent)
+                            finish()
+                        }
                     } else {
                         errorBarLabel.text = "Login failed: ${task.exception?.message ?: "Invalid credentials"}"
                         errorBarLabel.visibility = View.VISIBLE

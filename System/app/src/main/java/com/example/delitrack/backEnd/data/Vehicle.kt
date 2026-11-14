@@ -1,9 +1,9 @@
 package com.example.delitrack.backEnd.data
 
 data class Vehicle(
-    val vehicleId: String,
+    val vehicleId: String = "VHC-${System.currentTimeMillis().toString().takeLast(4)}",
     var plateNumber: String,
     var vehicleType: String, // "Motorcycle", "Delivery Van"
     var assignedRiderId: String? = null,
-    var status: String = "Available" // "Assigned", "Available"
+    var status: String = "Available" // "Available", "In Use", "Under Maintenance"
 )

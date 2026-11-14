@@ -115,8 +115,11 @@ class HomeFragment : Fragment() {
                 for (document in result) {
                     val data = document.data
                     val custId = data["customerId"] as? String ?: ""
-                    // If customerId matches or if it's demo/legacy data without customerId, include it for testing convenience
-                    if (custId.isEmpty() || custId == userId || currentUser?.email == "admin@delitrack.com") {
+                    val custEmail = data["customerEmail"] as? String ?: ""
+                    val isOwner = (custId == userId) || (currentUser?.email != null && custEmail.equals(currentUser.email, ignoreCase = true))
+                    val isDemoOrLegacy = custId.isEmpty() && currentUser?.email == "admin@delitrack.com"
+
+                    if (isOwner || isDemoOrLegacy) {
                         val deliveryId = data["deliveryId"] as? String ?: document.id
                         val status = data["status"] as? String ?: "Pending"
 
@@ -146,8 +149,9 @@ class HomeFragment : Fragment() {
                 } else {
                     for ((deliveryId, data) in deliveryList.entries.take(5)) {
                         val status = data["status"] as? String ?: "Pending"
-                        val pickup = data["pickupAddress"] as? String ?: "Nasugbu"
-                        val dest = data["destination"] as? String ?: "Lian"
+                        val receiver = data["receiverName"] as? String ?: data["customerName"] as? String ?: "N/A"
+                        val pickup = data["pickupAddress"] as? String ?: data["pickupLocation"] as? String ?: "Nasugbu, Batangas"
+                        val dest = data["destination"] as? String ?: data["deliveryAddress"] as? String ?: "Lian, Batangas"
                         val date = data["dateCreated"] as? String ?: "Today"
 
                         val cardView = layoutInflater.inflate(R.layout.item_delivery_card_snippet, containerRecentDeliveries, false) as? LinearLayout
@@ -172,8 +176,10 @@ class HomeFragment : Fragment() {
                                 }
                             }
 
-                            cardView.findViewById<TextView>(R.id.tvDeliveryRoute)?.text = "$pickup ➔ $dest"
-                            cardView.findViewById<TextView>(R.id.tvDeliveryDate)?.text = date
+                            cardView.findViewById<TextView>(R.id.tvReceiverName)?.text = "Receiver: $receiver"
+                            cardView.findViewById<TextView>(R.id.tvPickupLocation)?.text = "Pickup: $pickup"
+                            cardView.findViewById<TextView>(R.id.tvDeliveryDestination)?.text = "Destination: $dest"
+                            cardView.findViewById<TextView>(R.id.tvDeliveryDate)?.text = "Date Created: $date"
 
                             cardView.setOnClickListener {
                                 val intent = Intent(requireContext(), DeliveryTrackingActivity::class.java)

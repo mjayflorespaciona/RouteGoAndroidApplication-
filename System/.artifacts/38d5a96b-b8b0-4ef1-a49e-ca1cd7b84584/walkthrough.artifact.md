@@ -1,18 +1,16 @@
-# RoutGo Customer Dashboard Walkthrough
+# RoutGo Customer Login and Registration Walkthrough
 
-Successfully implemented the RoutGo Customer Dashboard fulfilling all design and functional requirements while reusing existing project structure and files without creating duplicate activities.
+Successfully created and improved the RoutGo Customer Login and Registration screens meeting all design and functional requirements.
 
 ## Changes Made
 
-### UI & Layout
-- **[fragment_home.xml](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/res/layout/fragment_home.xml)**: Redesigned the home dashboard with RoutGo branding/logo, customer welcome message (`tvWelcomeName`), Create New Delivery button (`btnNewDelivery`), Delivery Statistics counters (Active, Pending, Completed), Quick access cards for Track Package and My Deliveries, and Recent Delivery Activities section.
-- **[item_delivery_card_snippet.xml](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/res/layout/item_delivery_card_snippet.xml)**: Created reusable delivery card snippet for dynamic list rendering in Home and Deliveries screens.
-- **[fragment_deliveries.xml](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/res/layout/fragment_deliveries.xml)**: Updated deliveries fragment container for dynamic customer-specific delivery list population.
+### Login Screen
+- **[activity_admin_login.xml](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/res/layout/activity_admin_login.xml)**: Configured UI featuring RoutGo logo/branding, Email input field, Password input field, show/hide password toggle, login button, forgot password link, and create account prompt.
+- **[AdminLoginActivity.kt](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/java/com/example/delitrack/frontEnd/AdminLoginActivity.kt)**: Implemented input validation, Firebase authentication credential check, password reset handling, role checking, and seamless redirection to the Customer Dashboard.
 
-### Logic & Data Association
-- **[HomeFragment.kt](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/java/com/example/delitrack/frontEnd/HomeFragment.kt)**: Implemented customer profile fetching from Firebase Auth & Firestore `users`, querying customer deliveries, calculating Active/Pending/Completed counts, populating recent activities dynamically, and wiring up click listeners for all buttons and tabs.
-- **[DeliveriesFragment.kt](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/java/com/example/delitrack/frontEnd/DeliveriesFragment.kt)**: Added dynamic loading of customer-specific deliveries from Firestore with live filtering (All, Pending, In Transit, Delivered) and search support.
-- **[NewDeliveryActivity.kt](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/java/com/example/delitrack/frontEnd/NewDeliveryActivity.kt)**: Updated delivery creation to associate new requests with the logged-in customer's `customerId` and `customerEmail`.
+### Registration Screen
+- **[activity_create_account.xml](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/res/layout/activity_create_account.xml)**: Added the **Confirm Password** field (`confirmPasswordField`) and show/hide toggle alongside Full Name, Email Address, Contact Number, Password, Register button, and Back to Login link.
+- **[CreateAccountActivity.kt](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/java/com/example/delitrack/frontEnd/CreateAccountActivity.kt)**: Added validation for required fields, password match verification (`password == confirmPassword`), minimum password length check (6 chars), automatic assignment of `role: "Customer"` in Firestore `users`, prevention of admin registration, and successful redirection to the Customer Dashboard.
 
 ## Verification Results
 

@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:gravity="center"
-            android:text="Create Customer Account"
+            android:text="Create RoutGo Account"
             android:textColor="#111111"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -58,11 +58,50 @@
             android:orientation="vertical"
             android:padding="20dp">
 
+            <!-- Account Type Selection (Customer / Rider) -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Account Type *"
+                android:textColor="#333333"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/roleRadioGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radioCustomer"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:paddingStart="4dp"
+                    android:text="Customer"
+                    android:textColor="#111111"
+                    android:textSize="14sp" />
+
+                <RadioButton
+                    android:id="@+id/radioRider"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:paddingStart="4dp"
+                    android:text="Rider"
+                    android:textColor="#111111"
+                    android:textSize="14sp" />
+            </RadioGroup>
+
             <!-- Full Name -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Full Name"
+                android:layout_marginTop="12dp"
+                android:text="Full Name *"
                 android:textColor="#333333"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -83,7 +122,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Email Address"
+                android:text="Email Address *"
                 android:textColor="#333333"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -104,7 +143,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Phone Number"
+                android:text="Phone Number *"
                 android:textColor="#333333"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -125,7 +164,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Password"
+                android:text="Password *"
                 android:textColor="#333333"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -167,7 +206,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Confirm Password"
+                android:text="Confirm Password *"
                 android:textColor="#333333"
                 android:textSize="13sp"
                 android:textStyle="bold" />

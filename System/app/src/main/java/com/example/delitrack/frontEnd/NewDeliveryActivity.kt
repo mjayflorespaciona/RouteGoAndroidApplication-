@@ -27,45 +27,72 @@ class NewDeliveryActivity : AppCompatActivity() {
         }
 
         val backBtn = findViewById<TextView>(R.id.backBtn)
-        val customerNameField = findViewById<EditText>(R.id.customerNameField)
-        val contactNumberField = findViewById<EditText>(R.id.contactNumberField)
+        val senderNameField = findViewById<EditText>(R.id.senderNameField)
+        val senderContactField = findViewById<EditText>(R.id.senderContactField)
         val pickupAddressField = findViewById<EditText>(R.id.pickupAddressField)
-        val destinationField = findViewById<EditText>(R.id.destinationField)
+        val receiverNameField = findViewById<EditText>(R.id.receiverNameField)
+        val receiverContactField = findViewById<EditText>(R.id.receiverContactField)
+        val deliveryAddressField = findViewById<EditText>(R.id.deliveryAddressField)
         val packageDescField = findViewById<EditText>(R.id.packageDescField)
         val packageTypeField = findViewById<EditText>(R.id.packageTypeField)
         val deliveryNotesField = findViewById<EditText>(R.id.deliveryNotesField)
+        val pickupLocationField = findViewById<EditText>(R.id.pickupLocationField)
+        val destinationField = findViewById<EditText>(R.id.destinationField)
+        val deliveryDateField = findViewById<EditText>(R.id.deliveryDateField)
         val btnCreateDelivery = findViewById<Button>(R.id.btnCreateDelivery)
 
         backBtn.setOnClickListener { finish() }
 
         btnCreateDelivery.setOnClickListener {
-            val customerName = customerNameField.text.toString().trim()
-            val contact = contactNumberField.text.toString().trim()
-            val pickup = pickupAddressField.text.toString().trim()
+            val senderName = senderNameField.text.toString().trim()
+            val senderContact = senderContactField.text.toString().trim()
+            val pickupAddress = pickupAddressField.text.toString().trim()
+            val receiverName = receiverNameField.text.toString().trim()
+            val receiverContact = receiverContactField.text.toString().trim()
+            val deliveryAddress = deliveryAddressField.text.toString().trim()
+            val packageDesc = packageDescField.text.toString().trim()
+            val packageType = packageTypeField.text.toString().trim()
+            val deliveryNotes = deliveryNotesField.text.toString().trim()
+            val pickupLocation = pickupLocationField.text.toString().trim()
             val destination = destinationField.text.toString().trim()
-            val description = packageDescField.text.toString().trim()
-            val type = packageTypeField.text.toString().trim()
-            val notes = deliveryNotesField.text.toString().trim()
+            val deliveryDate = deliveryDateField.text.toString().trim()
 
-            if (customerName.isEmpty() || contact.isEmpty() || pickup.isEmpty() || destination.isEmpty() || description.isEmpty()) {
-                Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show()
+            if (senderName.isEmpty() || senderContact.isEmpty() || pickupAddress.isEmpty() ||
+                receiverName.isEmpty() || receiverContact.isEmpty() || deliveryAddress.isEmpty() ||
+                packageDesc.isEmpty()) {
+                Toast.makeText(this, "Please fill in all required fields (*)", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             val deliveryId = "DLV-${System.currentTimeMillis().toString().takeLast(4)}"
             val currentUser = FirebaseAuth.getInstance().currentUser
             val db = FirebaseFirestore.getInstance()
+
             val deliveryMap = hashMapOf(
                 "deliveryId" to deliveryId,
-                "customerName" to customerName,
-                "contactNumber" to contact,
-                "pickupAddress" to pickup,
-                "destination" to destination,
-                "packageDescription" to description,
-                "packageType" to type,
-                "deliveryNotes" to notes,
+                // Sender Information
+                "senderName" to senderName,
+                "senderContact" to senderContact,
+                "pickupAddress" to pickupAddress,
+                // Receiver Information
+                "receiverName" to receiverName,
+                "receiverContact" to receiverContact,
+                "deliveryAddress" to deliveryAddress,
+                // Backward compatibility fields for legacy views
+                "customerName" to senderName,
+                "contactNumber" to senderContact,
+                "destination" to deliveryAddress,
+                // Package Information
+                "packageDescription" to packageDesc,
+                "packageType" to packageType,
+                "deliveryNotes" to deliveryNotes,
+                // Delivery Information & Route
+                "pickupLocation" to pickupLocation,
+                "deliveryDate" to deliveryDate,
+                "routeName" to "Nasugbu - Lian Route",
+                // Functional requirements: status set to PENDING
                 "status" to "Pending",
-                "dateCreated" to "Today",
+                "dateCreated" to (if (deliveryDate.isNotEmpty()) deliveryDate else "Today"),
                 "customerId" to (currentUser?.uid ?: "default_customer"),
                 "customerEmail" to (currentUser?.email ?: "")
             )
@@ -75,7 +102,7 @@ class NewDeliveryActivity : AppCompatActivity() {
                 .set(deliveryMap)
                 .addOnSuccessListener {
                     btnCreateDelivery.isEnabled = true
-                    Toast.makeText(this, "Delivery $deliveryId Requested Successfully! Status: Pending", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Delivery Request $deliveryId Submitted Successfully! Status: PENDING", Toast.LENGTH_LONG).show()
                     val intent = Intent(this, SelectRouteActivity::class.java)
                     intent.putExtra("deliveryId", deliveryId)
                     startActivity(intent)
@@ -83,7 +110,7 @@ class NewDeliveryActivity : AppCompatActivity() {
                 }
                 .addOnFailureListener { e ->
                     btnCreateDelivery.isEnabled = true
-                    Toast.makeText(this, "Failed to submit delivery: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Failed to submit delivery request: ${e.message}", Toast.LENGTH_LONG).show()
                 }
         }
     }

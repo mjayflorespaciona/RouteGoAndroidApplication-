@@ -1,9 +1,12 @@
 package com.example.delitrack.frontEnd
 
 import android.app.AlertDialog
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -21,34 +24,34 @@ import com.example.delitrack.backEnd.data.Vehicle
 class AssignRiderVehicleActivity : AppCompatActivity() {
 
     private val ridersList = mutableListOf(
-        Rider("RDR-101", "Mark Santos", "0917 123 4567", "TRK-001", "Active"),
-        Rider("RDR-102", "Ana Garcia", "0918 765 4321", "VAN-002", "Active"),
-        Rider("RDR-103", "Carlos Mendoza", "0919 222 3333", "MTR-001", "Active"),
-        Rider("RDR-104", "David Reyes", "0920 444 5555", "MTR-002", "Active"),
-        Rider("RDR-105", "Elena Torres", "0921 666 7777", "MTR-003", "Active"),
-        Rider("RDR-106", "Fernando Cruz", "0922 888 9999", "MTR-004", "Active"),
-        Rider("RDR-107", "Grace Ramos", "0923 111 2222", "MTR-005", "Active"),
-        Rider("RDR-108", "Hector Lopez", "0924 333 4444", "MTR-006", "Active"),
-        Rider("RDR-109", "Isabel Aquino", "0925 555 6666", "MTR-007", "Active"),
-        Rider("RDR-110", "Jake Bautista", "0926 777 8888", "MTR-008", "Active"),
-        Rider("RDR-111", "Karen Diaz", "0927 999 0000", null, "Available"),
-        Rider("RDR-112", "Leo Navarro", "0928 123 1111", null, "Available"),
-        Rider("RDR-113", "Mia Castelo", "0929 234 2222", null, "Available"),
-        Rider("RDR-114", "Nathan Silva", "0930 345 3333", null, "Available"),
-        Rider("RDR-115", "Olivia Perez", "0931 456 4444", null, "Available")
+        Rider("RDR-101", "Mark Santos", "0917 123 4567", "TRK-001", "On Delivery"),
+        Rider("RDR-102", "Ana Garcia", "0918 765 4321", "VAN-002", "On Delivery"),
+        Rider("RDR-103", "Carlos Mendoza", "0919 222 3333", "MTR-001", "On Delivery"),
+        Rider("RDR-104", "Juan Dela Cruz", "0920 444 5555", null, "Available"),
+        Rider("RDR-105", "Maria Santos", "0921 666 7777", null, "Available"),
+        Rider("RDR-106", "Jose Rizal", "0922 888 9999", null, "Available"),
+        Rider("RDR-107", "Andres Bonifacio", "0923 111 2222", null, "Available"),
+        Rider("RDR-108", "Gabriela Silang", "0924 333 4444", null, "Available"),
+        Rider("RDR-109", "Emilio Aguinaldo", "0925 555 6666", null, "Available"),
+        Rider("RDR-110", "Apolinario Mabini", "0926 777 8888", null, "Available"),
+        Rider("RDR-111", "Melchora Aquino", "0927 999 0000", null, "Available"),
+        Rider("RDR-112", "Antonio Luna", "0928 123 1111", null, "Available"),
+        Rider("RDR-113", "Diego Silang", "0929 234 2222", null, "Available"),
+        Rider("RDR-114", "Miguel Malvar", "0930 345 3333", null, "Off Duty"),
+        Rider("RDR-115", "Teresa Magbanua", "0931 456 4444", null, "Off Duty")
     )
 
     private val vehiclesList = mutableListOf(
-        Vehicle("TRK-001", "NKR-1234", "Delivery Van", "RDR-101", "Assigned"),
-        Vehicle("VAN-002", "L300-567", "Delivery Van", "RDR-102", "Assigned"),
-        Vehicle("MTR-001", "MC-1011", "Motorcycle", "RDR-103", "Assigned"),
-        Vehicle("MTR-002", "MC-1022", "Motorcycle", "RDR-104", "Assigned"),
-        Vehicle("MTR-003", "MC-1033", "Motorcycle", "RDR-105", "Assigned"),
-        Vehicle("MTR-004", "MC-1044", "Motorcycle", "RDR-106", "Assigned"),
-        Vehicle("MTR-005", "MC-1055", "Motorcycle", "RDR-107", "Assigned"),
-        Vehicle("MTR-006", "MC-1066", "Motorcycle", "RDR-108", "Assigned"),
-        Vehicle("MTR-007", "MC-1077", "Motorcycle", "RDR-109", "Assigned"),
-        Vehicle("MTR-008", "MC-1088", "Motorcycle", "RDR-110", "Assigned")
+        Vehicle("TRK-001", "NKR-1234", "Delivery Van", "RDR-101", "In Use"),
+        Vehicle("VAN-002", "L300-567", "Delivery Van", "RDR-102", "In Use"),
+        Vehicle("MTR-001", "MC-1011", "Motorcycle", "RDR-103", "In Use"),
+        Vehicle("MTR-002", "MC-1022", "Motorcycle", null, "Available"),
+        Vehicle("MTR-003", "MC-1033", "Motorcycle", null, "Available"),
+        Vehicle("MTR-004", "MC-1044", "Motorcycle", null, "Available"),
+        Vehicle("MTR-005", "MC-1055", "Motorcycle", null, "Available"),
+        Vehicle("MTR-006", "MC-1066", "Motorcycle", null, "Available"),
+        Vehicle("MTR-007", "MC-1077", "Motorcycle", null, "Under Maintenance"),
+        Vehicle("MTR-008", "MC-1088", "Motorcycle", null, "Available")
     )
 
     private lateinit var riderListContainer: LinearLayout
@@ -58,12 +61,38 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
     private lateinit var tabRidersBtn: Button
     private lateinit var tabVehiclesBtn: Button
 
+    // Rider Filters & Search
+    private lateinit var searchRiderField: EditText
+    private lateinit var btnFilterRiderAll: Button
+    private lateinit var btnFilterRiderAvailable: Button
+    private lateinit var btnFilterRiderOnDelivery: Button
+    private lateinit var btnFilterRiderOffDuty: Button
+
+    // Vehicle Filters & Search
+    private lateinit var searchVehicleField: EditText
+    private lateinit var btnFilterVehicleAll: Button
+    private lateinit var btnFilterVehicleMotorcycle: Button
+    private lateinit var btnFilterVehicleVan: Button
+    private lateinit var btnFilterVehicleAvailable: Button
+    private lateinit var btnFilterVehicleInUse: Button
+    private lateinit var btnFilterVehicleMaintenance: Button
+
+    // Dashboard Statistics views
     private lateinit var tvTotalRiders: TextView
-    private lateinit var tvActiveRiders: TextView
     private lateinit var tvAvailableRiders: TextView
+    private lateinit var tvOnDeliveryRiders: TextView
+    private lateinit var tvOffDutyRiders: TextView
+
     private lateinit var tvTotalVehicles: TextView
-    private lateinit var tvMotorcycles: TextView
-    private lateinit var tvVans: TextView
+    private lateinit var tvAvailableVehicles: TextView
+    private lateinit var tvVehiclesInUse: TextView
+    private lateinit var tvVehiclesMaintenance: TextView
+
+    private var currentRiderFilter = "All"
+    private var riderSearchQuery = ""
+
+    private var currentVehicleFilter = "All"
+    private var vehicleSearchQuery = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,15 +114,65 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
         tabRidersBtn = findViewById(R.id.tabRidersBtn)
         tabVehiclesBtn = findViewById(R.id.tabVehiclesBtn)
 
+        searchRiderField = findViewById(R.id.searchRiderField)
+        btnFilterRiderAll = findViewById(R.id.btnFilterRiderAll)
+        btnFilterRiderAvailable = findViewById(R.id.btnFilterRiderAvailable)
+        btnFilterRiderOnDelivery = findViewById(R.id.btnFilterRiderOnDelivery)
+        btnFilterRiderOffDuty = findViewById(R.id.btnFilterRiderOffDuty)
+
+        searchVehicleField = findViewById(R.id.searchVehicleField)
+        btnFilterVehicleAll = findViewById(R.id.btnFilterVehicleAll)
+        btnFilterVehicleMotorcycle = findViewById(R.id.btnFilterVehicleMotorcycle)
+        btnFilterVehicleVan = findViewById(R.id.btnFilterVehicleVan)
+        btnFilterVehicleAvailable = findViewById(R.id.btnFilterVehicleAvailable)
+        btnFilterVehicleInUse = findViewById(R.id.btnFilterVehicleInUse)
+        btnFilterVehicleMaintenance = findViewById(R.id.btnFilterVehicleMaintenance)
+
+        // Bind statistics views
         tvTotalRiders = findViewById(R.id.tvTotalRiders)
-        tvActiveRiders = findViewById(R.id.tvActiveRiders)
         tvAvailableRiders = findViewById(R.id.tvAvailableRiders)
+        tvOnDeliveryRiders = findViewById(R.id.tvOnDeliveryRiders)
+        tvOffDutyRiders = findViewById(R.id.tvOffDutyRiders)
+
         tvTotalVehicles = findViewById(R.id.tvTotalVehicles)
-        tvMotorcycles = findViewById(R.id.tvMotorcycles)
-        tvVans = findViewById(R.id.tvVans)
+        tvAvailableVehicles = findViewById(R.id.tvAvailableVehicles)
+        tvVehiclesInUse = findViewById(R.id.tvVehiclesInUse)
+        tvVehiclesMaintenance = findViewById(R.id.tvVehiclesMaintenance)
 
         tabRidersBtn.setOnClickListener { switchTab("Riders") }
         tabVehiclesBtn.setOnClickListener { switchTab("Vehicles") }
+
+        // Rider Search & Filter listeners
+        btnFilterRiderAll.setOnClickListener { setRiderFilter("All") }
+        btnFilterRiderAvailable.setOnClickListener { setRiderFilter("Available") }
+        btnFilterRiderOnDelivery.setOnClickListener { setRiderFilter("On Delivery") }
+        btnFilterRiderOffDuty.setOnClickListener { setRiderFilter("Off Duty") }
+
+        searchRiderField.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                riderSearchQuery = s?.toString()?.trim() ?: ""
+                renderRidersList()
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        // Vehicle Search & Filter listeners
+        btnFilterVehicleAll.setOnClickListener { setVehicleFilter("All") }
+        btnFilterVehicleMotorcycle.setOnClickListener { setVehicleFilter("Motorcycle") }
+        btnFilterVehicleVan.setOnClickListener { setVehicleFilter("Delivery Van") }
+        btnFilterVehicleAvailable.setOnClickListener { setVehicleFilter("Available") }
+        btnFilterVehicleInUse.setOnClickListener { setVehicleFilter("In Use") }
+        btnFilterVehicleMaintenance.setOnClickListener { setVehicleFilter("Under Maintenance") }
+
+        searchVehicleField.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                vehicleSearchQuery = s?.toString()?.trim() ?: ""
+                renderVehiclesList()
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
 
         findViewById<Button>(R.id.btnAddRider).setOnClickListener { showAddRiderDialog() }
         findViewById<Button>(R.id.btnAddVehicle).setOnClickListener { showAddVehicleDialog() }
@@ -101,6 +180,57 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
         updateOverviewStats()
         renderRidersList()
         renderVehiclesList()
+    }
+
+    private fun setRiderFilter(filter: String) {
+        currentRiderFilter = filter
+        updateRiderFilterButtonStyles()
+        renderRidersList()
+    }
+
+    private fun updateRiderFilterButtonStyles() {
+        val activeBg = ColorStateList.valueOf(Color.parseColor("#0B4F2C"))
+        val inactiveBg = ColorStateList.valueOf(Color.parseColor("#E5E7E6"))
+        val activeText = Color.WHITE
+        val inactiveText = Color.parseColor("#555555")
+
+        val buttons = listOf(btnFilterRiderAll, btnFilterRiderAvailable, btnFilterRiderOnDelivery, btnFilterRiderOffDuty)
+        val filters = listOf("All", "Available", "On Delivery", "Off Duty")
+
+        for (i in buttons.indices) {
+            val btn = buttons[i]
+            val f = filters[i]
+            val isActive = (currentRiderFilter == f)
+            btn.backgroundTintList = if (isActive) activeBg else inactiveBg
+            btn.setTextColor(if (isActive) activeText else inactiveText)
+        }
+    }
+
+    private fun setVehicleFilter(filter: String) {
+        currentVehicleFilter = filter
+        updateVehicleFilterButtonStyles()
+        renderVehiclesList()
+    }
+
+    private fun updateVehicleFilterButtonStyles() {
+        val activeBg = ColorStateList.valueOf(Color.parseColor("#0B4F2C"))
+        val inactiveBg = ColorStateList.valueOf(Color.parseColor("#E5E7E6"))
+        val activeText = Color.WHITE
+        val inactiveText = Color.parseColor("#555555")
+
+        val buttons = listOf(
+            btnFilterVehicleAll, btnFilterVehicleMotorcycle, btnFilterVehicleVan,
+            btnFilterVehicleAvailable, btnFilterVehicleInUse, btnFilterVehicleMaintenance
+        )
+        val filters = listOf("All", "Motorcycle", "Delivery Van", "Available", "In Use", "Under Maintenance")
+
+        for (i in buttons.indices) {
+            val btn = buttons[i]
+            val f = filters[i]
+            val isActive = (currentVehicleFilter == f)
+            btn.backgroundTintList = if (isActive) activeBg else inactiveBg
+            btn.setTextColor(if (isActive) activeText else inactiveText)
+        }
     }
 
     private fun switchTab(tab: String) {
@@ -130,26 +260,59 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
 
     private fun updateOverviewStats() {
         val totalRiders = ridersList.size
-        val activeRiders = ridersList.count { it.status == "Active" }
-        val availableRiders = ridersList.count { it.status == "Available" }
+        val availableRiders = ridersList.count { it.status.equals("Available", ignoreCase = true) }
+        val onDeliveryRiders = ridersList.count { it.status.equals("On Delivery", ignoreCase = true) }
+        val offDutyRiders = ridersList.count { it.status.equals("Off Duty", ignoreCase = true) }
 
         val totalVehicles = vehiclesList.size
-        val motorcycles = vehiclesList.count { it.vehicleType == "Motorcycle" }
-        val vans = vehiclesList.count { it.vehicleType == "Delivery Van" }
+        val availableVehicles = vehiclesList.count { it.status.equals("Available", ignoreCase = true) }
+        val vehiclesInUse = vehiclesList.count { it.status.equals("In Use", ignoreCase = true) }
+        val vehiclesMaintenance = vehiclesList.count { it.status.equals("Under Maintenance", ignoreCase = true) }
 
         tvTotalRiders.text = totalRiders.toString()
-        tvActiveRiders.text = activeRiders.toString()
         tvAvailableRiders.text = availableRiders.toString()
+        tvOnDeliveryRiders.text = onDeliveryRiders.toString()
+        tvOffDutyRiders.text = offDutyRiders.toString()
 
         tvTotalVehicles.text = totalVehicles.toString()
-        tvMotorcycles.text = motorcycles.toString()
-        tvVans.text = vans.toString()
+        tvAvailableVehicles.text = availableVehicles.toString()
+        tvVehiclesInUse.text = vehiclesInUse.toString()
+        tvVehiclesMaintenance.text = vehiclesMaintenance.toString()
     }
 
     private fun renderRidersList() {
         riderListContainer.removeAllViews()
 
-        for (rider in ridersList) {
+        val filteredList = ridersList.filter { rider ->
+            val matchesFilter = when (currentRiderFilter) {
+                "All" -> true
+                "Available" -> rider.status.equals("Available", ignoreCase = true)
+                "On Delivery" -> rider.status.equals("On Delivery", ignoreCase = true)
+                "Off Duty" -> rider.status.equals("Off Duty", ignoreCase = true)
+                else -> true
+            }
+
+            val query = riderSearchQuery.lowercase()
+            val matchesSearch = query.isEmpty() ||
+                    rider.fullName.lowercase().contains(query) ||
+                    rider.riderId.lowercase().contains(query) ||
+                    rider.phone.contains(query)
+
+            matchesFilter && matchesSearch
+        }
+
+        if (filteredList.isEmpty()) {
+            val emptyTv = TextView(this).apply {
+                text = "No riders match your search or filter."
+                setTextColor(Color.parseColor("#777777"))
+                textSize = 14f
+                setPadding(16, 24, 16, 24)
+            }
+            riderListContainer.addView(emptyTv)
+            return
+        }
+
+        for (rider in filteredList) {
             val card = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
                 setBackgroundResource(android.R.drawable.dialog_holo_light_frame)
@@ -179,15 +342,19 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
                 textSize = 11f
                 setTypeface(null, Typeface.BOLD)
                 setPadding(16, 4, 16, 4)
-                if (rider.status == "Active") {
-                    setBackgroundColor(Color.parseColor("#E0F2FE"))
-                    setTextColor(Color.parseColor("#0284C7"))
-                } else if (rider.status == "Available") {
-                    setBackgroundColor(Color.parseColor("#DCFCE7"))
-                    setTextColor(Color.parseColor("#16A34A"))
-                } else {
-                    setBackgroundColor(Color.parseColor("#F1F5F9"))
-                    setTextColor(Color.parseColor("#64748B"))
+                when (rider.status) {
+                    "On Delivery" -> {
+                        setBackgroundColor(Color.parseColor("#E0F2FE"))
+                        setTextColor(Color.parseColor("#0284C7"))
+                    }
+                    "Available" -> {
+                        setBackgroundColor(Color.parseColor("#DCFCE7"))
+                        setTextColor(Color.parseColor("#16A34A"))
+                    }
+                    else -> { // Off Duty
+                        setBackgroundColor(Color.parseColor("#F1F5F9"))
+                        setTextColor(Color.parseColor("#64748B"))
+                    }
                 }
             }
 
@@ -205,7 +372,8 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
 
             val vehicleView = TextView(this).apply {
                 val vId = rider.assignedVehicleId
-                text = if (vId != null) "Vehicle: $vId" else "Vehicle: None Assigned"
+                val assignedV = vehiclesList.find { it.vehicleId == vId }
+                text = if (vId != null) "Assigned Vehicle: $vId (${assignedV?.plateNumber ?: ""})" else "Assigned Vehicle: None"
                 setTextColor(Color.parseColor("#0B4F2C"))
                 textSize = 13f
                 setTypeface(null, Typeface.BOLD)
@@ -239,13 +407,13 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
                 layoutParams = lp
                 setOnClickListener {
                     rider.status = when (rider.status) {
-                        "Available" -> "Active"
-                        "Active" -> "Offline"
+                        "Available" -> "On Delivery"
+                        "On Delivery" -> "Off Duty"
                         else -> "Available"
                     }
                     updateOverviewStats()
                     renderRidersList()
-                    Toast.makeText(this@AssignRiderVehicleActivity, "${rider.fullName} status: ${rider.status}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@AssignRiderVehicleActivity, "${rider.fullName} status updated: ${rider.status}", Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -268,10 +436,17 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
                 val lp = LinearLayout.LayoutParams(0, 90, 1f)
                 layoutParams = lp
                 setOnClickListener {
+                    val prevV = vehiclesList.find { it.vehicleId == rider.assignedVehicleId }
+                    if (prevV != null) {
+                        prevV.assignedRiderId = null
+                        prevV.status = "Available"
+                    }
+
                     ridersList.remove(rider)
                     updateOverviewStats()
                     renderRidersList()
-                    Toast.makeText(this@AssignRiderVehicleActivity, "Rider deleted", Toast.LENGTH_SHORT).show()
+                    renderVehiclesList()
+                    Toast.makeText(this@AssignRiderVehicleActivity, "Rider ${rider.fullName} deleted", Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -288,7 +463,38 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
     private fun renderVehiclesList() {
         vehicleListContainer.removeAllViews()
 
-        for (vehicle in vehiclesList) {
+        val filteredList = vehiclesList.filter { vehicle ->
+            val matchesFilter = when (currentVehicleFilter) {
+                "All" -> true
+                "Motorcycle" -> vehicle.vehicleType.equals("Motorcycle", ignoreCase = true)
+                "Delivery Van" -> vehicle.vehicleType.equals("Delivery Van", ignoreCase = true)
+                "Available" -> vehicle.status.equals("Available", ignoreCase = true)
+                "In Use" -> vehicle.status.equals("In Use", ignoreCase = true)
+                "Under Maintenance" -> vehicle.status.equals("Under Maintenance", ignoreCase = true)
+                else -> true
+            }
+
+            val query = vehicleSearchQuery.lowercase()
+            val matchesSearch = query.isEmpty() ||
+                    vehicle.plateNumber.lowercase().contains(query) ||
+                    vehicle.vehicleId.lowercase().contains(query) ||
+                    vehicle.vehicleType.lowercase().contains(query)
+
+            matchesFilter && matchesSearch
+        }
+
+        if (filteredList.isEmpty()) {
+            val emptyTv = TextView(this).apply {
+                text = "No vehicles match your search or filter."
+                setTextColor(Color.parseColor("#777777"))
+                textSize = 14f
+                setPadding(16, 24, 16, 24)
+            }
+            vehicleListContainer.addView(emptyTv)
+            return
+        }
+
+        for (vehicle in filteredList) {
             val card = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
                 setBackgroundResource(android.R.drawable.dialog_holo_light_frame)
@@ -318,12 +524,19 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
                 textSize = 11f
                 setTypeface(null, Typeface.BOLD)
                 setPadding(16, 4, 16, 4)
-                if (vehicle.status == "Assigned") {
-                    setBackgroundColor(Color.parseColor("#FEF3C7"))
-                    setTextColor(Color.parseColor("#D97706"))
-                } else {
-                    setBackgroundColor(Color.parseColor("#DCFCE7"))
-                    setTextColor(Color.parseColor("#16A34A"))
+                when (vehicle.status) {
+                    "In Use" -> {
+                        setBackgroundColor(Color.parseColor("#FEF3C7"))
+                        setTextColor(Color.parseColor("#D97706"))
+                    }
+                    "Under Maintenance" -> {
+                        setBackgroundColor(Color.parseColor("#FEE2E2"))
+                        setTextColor(Color.parseColor("#DC2626"))
+                    }
+                    else -> { // "Available"
+                        setBackgroundColor(Color.parseColor("#DCFCE7"))
+                        setTextColor(Color.parseColor("#16A34A"))
+                    }
                 }
             }
 
@@ -341,7 +554,7 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
 
             val riderView = TextView(this).apply {
                 val assignedRider = ridersList.find { it.riderId == vehicle.assignedRiderId }
-                text = if (assignedRider != null) "Rider: ${assignedRider.fullName} (${assignedRider.riderId})" else "Rider: None Assigned"
+                text = if (assignedRider != null) "Assigned Rider: ${assignedRider.fullName} (${assignedRider.riderId})" else "Assigned Rider: None"
                 setTextColor(Color.parseColor("#0B4F2C"))
                 textSize = 13f
                 setTypeface(null, Typeface.BOLD)
@@ -365,6 +578,37 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
                 setOnClickListener { showEditVehicleDialog(vehicle) }
             }
 
+            val btnToggleStatus = Button(this).apply {
+                text = "Status"
+                textSize = 11f
+                setBackgroundColor(Color.parseColor("#0284C7"))
+                setTextColor(Color.WHITE)
+                val lp = LinearLayout.LayoutParams(0, 90, 1f)
+                lp.setMargins(0, 0, 8, 0)
+                layoutParams = lp
+                setOnClickListener {
+                    vehicle.status = when (vehicle.status) {
+                        "Available" -> "In Use"
+                        "In Use" -> "Under Maintenance"
+                        else -> "Available"
+                    }
+                    updateOverviewStats()
+                    renderVehiclesList()
+                    Toast.makeText(this@AssignRiderVehicleActivity, "${vehicle.plateNumber} status: ${vehicle.status}", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            val btnAssignRider = Button(this).apply {
+                text = "Assign"
+                textSize = 11f
+                setBackgroundColor(Color.parseColor("#16A34A"))
+                setTextColor(Color.WHITE)
+                val lp = LinearLayout.LayoutParams(0, 90, 1f)
+                lp.setMargins(0, 0, 8, 0)
+                layoutParams = lp
+                setOnClickListener { showAssignRiderToVehicleDialog(vehicle) }
+            }
+
             val btnDelete = Button(this).apply {
                 text = "Delete"
                 textSize = 11f
@@ -373,14 +617,23 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
                 val lp = LinearLayout.LayoutParams(0, 90, 1f)
                 layoutParams = lp
                 setOnClickListener {
+                    val prevRider = ridersList.find { it.riderId == vehicle.assignedRiderId }
+                    if (prevRider != null) {
+                        prevRider.assignedVehicleId = null
+                        prevRider.status = "Available"
+                    }
+
                     vehiclesList.remove(vehicle)
                     updateOverviewStats()
+                    renderRidersList()
                     renderVehiclesList()
-                    Toast.makeText(this@AssignRiderVehicleActivity, "Vehicle deleted", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@AssignRiderVehicleActivity, "Vehicle ${vehicle.plateNumber} deleted", Toast.LENGTH_SHORT).show()
                 }
             }
 
             actionsBar.addView(btnEdit)
+            actionsBar.addView(btnToggleStatus)
+            actionsBar.addView(btnAssignRider)
             actionsBar.addView(btnDelete)
 
             card.addView(actionsBar)
@@ -407,7 +660,7 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
                 val name = nameInput.text.toString().trim()
                 val phone = phoneInput.text.toString().trim()
                 if (name.isNotEmpty() && phone.isNotEmpty()) {
-                    val newId = "RDR-${100 + ridersList.size + 1}"
+                    val newId = "RDR-${System.currentTimeMillis().toString().takeLast(4)}"
                     ridersList.add(Rider(newId, name, phone, null, "Available"))
                     updateOverviewStats()
                     renderRidersList()
@@ -468,8 +721,15 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
                 val plate = plateInput.text.toString().trim()
                 val type = typeInput.text.toString().trim()
                 if (plate.isNotEmpty() && type.isNotEmpty()) {
-                    val newId = "VHC-${100 + vehiclesList.size + 1}"
-                    vehiclesList.add(Vehicle(newId, plate, type, null, "Available"))
+                    val isDuplicate = vehiclesList.any { it.plateNumber.equals(plate, ignoreCase = true) }
+                    if (isDuplicate) {
+                        Toast.makeText(this, "Vehicle with plate number $plate already exists!", Toast.LENGTH_LONG).show()
+                        return@setPositiveButton
+                    }
+
+                    val newId = "VHC-${System.currentTimeMillis().toString().takeLast(4)}"
+                    val finalType = if (type.lowercase().contains("van")) "Delivery Van" else "Motorcycle"
+                    vehiclesList.add(Vehicle(newId, plate, finalType, null, "Available"))
                     updateOverviewStats()
                     renderVehiclesList()
                     Toast.makeText(this, "Vehicle $plate Added Successfully!", Toast.LENGTH_SHORT).show()
@@ -500,8 +760,16 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
                 val plate = plateInput.text.toString().trim()
                 val type = typeInput.text.toString().trim()
                 if (plate.isNotEmpty() && type.isNotEmpty()) {
+                    val isDuplicate = vehiclesList.any { 
+                        it.vehicleId != vehicle.vehicleId && it.plateNumber.equals(plate, ignoreCase = true) 
+                    }
+                    if (isDuplicate) {
+                        Toast.makeText(this, "Vehicle with plate number $plate already exists!", Toast.LENGTH_LONG).show()
+                        return@setPositiveButton
+                    }
+
                     vehicle.plateNumber = plate
-                    vehicle.vehicleType = type
+                    vehicle.vehicleType = if (type.lowercase().contains("van")) "Delivery Van" else "Motorcycle"
                     renderVehiclesList()
                     Toast.makeText(this, "Vehicle Updated!", Toast.LENGTH_SHORT).show()
                 }
@@ -511,45 +779,149 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
     }
 
     private fun showAssignVehicleDialog(rider: Rider) {
-        val vehicleOptions = vehiclesList.map { v ->
+        if (rider.status.equals("Off Duty", ignoreCase = true)) {
+            AlertDialog.Builder(this)
+                .setTitle("Off Duty Rider!")
+                .setMessage("Rider ${rider.fullName} is currently Off Duty. Off Duty riders cannot receive vehicle assignments. Please change rider status to Available first.")
+                .setPositiveButton("OK", null)
+                .show()
+            return
+        }
+
+        val optionsList = mutableListOf<String>()
+        val selectableVehicles = mutableListOf<Vehicle?>()
+
+        optionsList.add("[Clear / Remove Vehicle Assignment]")
+        selectableVehicles.add(null)
+
+        for (v in vehiclesList) {
+            if (v.status.equals("Under Maintenance", ignoreCase = true)) {
+                continue
+            }
+
             val assignedTo = ridersList.find { it.riderId == v.assignedRiderId }
             if (v.assignedRiderId != null && v.assignedRiderId != rider.riderId) {
-                "${v.vehicleId} (${v.plateNumber}) - Occupied by ${assignedTo?.fullName ?: v.assignedRiderId}"
+                optionsList.add("${v.vehicleId} (${v.plateNumber}) - Occupied by ${assignedTo?.fullName ?: v.assignedRiderId}")
             } else {
-                "${v.vehicleId} (${v.plateNumber}) - ${v.vehicleType}"
+                optionsList.add("${v.vehicleId} (${v.plateNumber}) - ${v.vehicleType} [${v.status}]")
             }
-        }.toTypedArray()
+            selectableVehicles.add(v)
+        }
 
         AlertDialog.Builder(this)
             .setTitle("Assign Vehicle to ${rider.fullName}")
-            .setItems(vehicleOptions) { _, which ->
-                val selectedV = vehiclesList[which]
+            .setItems(optionsList.toTypedArray()) { _, which ->
+                val selectedV = selectableVehicles[which]
 
-                // OCCUPIED VEHICLE GUARD: Prevent assigning an occupied vehicle to another rider!
-                if (selectedV.assignedRiderId != null && selectedV.assignedRiderId != rider.riderId) {
-                    val currentRiderName = ridersList.find { it.riderId == selectedV.assignedRiderId }?.fullName ?: selectedV.assignedRiderId
-                    AlertDialog.Builder(this)
-                        .setTitle("Vehicle Occupied!")
-                        .setMessage("Vehicle ${selectedV.plateNumber} is already assigned to $currentRiderName. You cannot assign an occupied vehicle to another rider.")
-                        .setPositiveButton("OK", null)
-                        .show()
+                if (selectedV == null) {
+                    val prevV = vehiclesList.find { t -> t.vehicleId == rider.assignedVehicleId }
+                    if (prevV != null) {
+                        prevV.assignedRiderId = null
+                        prevV.status = "Available"
+                    }
+                    rider.assignedVehicleId = null
+                    rider.status = "Available"
+
+                    updateOverviewStats()
+                    renderRidersList()
+                    renderVehiclesList()
+                    Toast.makeText(this, "Vehicle assignment cleared for ${rider.fullName}!", Toast.LENGTH_LONG).show()
                 } else {
-                    val prevV = vehiclesList.find { it.vehicleId == rider.assignedVehicleId }
+                    if (selectedV.assignedRiderId != null && selectedV.assignedRiderId != rider.riderId) {
+                        val currentRiderName = ridersList.find { it.riderId == selectedV.assignedRiderId }?.fullName ?: selectedV.assignedRiderId
+                        AlertDialog.Builder(this)
+                            .setTitle("Vehicle Occupied!")
+                            .setMessage("Vehicle ${selectedV.plateNumber} is already assigned to $currentRiderName. You cannot assign an occupied vehicle to another rider.")
+                            .setPositiveButton("OK", null)
+                            .show()
+                    } else {
+                        val prevV = vehiclesList.find { t -> t.vehicleId == rider.assignedVehicleId }
+                        if (prevV != null) {
+                            prevV.assignedRiderId = null
+                            prevV.status = "Available"
+                        }
+
+                        rider.assignedVehicleId = selectedV.vehicleId
+                        rider.status = "On Delivery"
+                        selectedV.assignedRiderId = rider.riderId
+                        selectedV.status = "In Use"
+
+                        updateOverviewStats()
+                        renderRidersList()
+                        renderVehiclesList()
+
+                        Toast.makeText(this, "Vehicle ${selectedV.plateNumber} Assigned to ${rider.fullName}!", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showAssignRiderToVehicleDialog(vehicle: Vehicle) {
+        if (vehicle.status.equals("Under Maintenance", ignoreCase = true)) {
+            AlertDialog.Builder(this)
+                .setTitle("Vehicle Under Maintenance!")
+                .setMessage("Vehicle ${vehicle.plateNumber} is currently Under Maintenance and cannot be assigned to any rider. Please change vehicle status to Available first.")
+                .setPositiveButton("OK", null)
+                .show()
+            return
+        }
+
+        val optionsList = mutableListOf<String>()
+        val selectableRiders = mutableListOf<Rider?>()
+
+        optionsList.add("[Clear / Remove Rider Assignment]")
+        selectableRiders.add(null)
+
+        for (r in ridersList) {
+            if (r.status.equals("Off Duty", ignoreCase = true)) {
+                continue
+            }
+
+            if (r.assignedVehicleId != null && r.assignedVehicleId != vehicle.vehicleId) {
+                optionsList.add("${r.riderId} • ${r.fullName} (Already assigned to ${r.assignedVehicleId})")
+            } else {
+                optionsList.add("${r.riderId} • ${r.fullName} [${r.status}]")
+            }
+            selectableRiders.add(r)
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Assign Rider to Vehicle ${vehicle.plateNumber}")
+            .setItems(optionsList.toTypedArray()) { _, which ->
+                val selectedRider = selectableRiders[which]
+
+                if (selectedRider == null) {
+                    val prevRider = ridersList.find { it.riderId == vehicle.assignedRiderId }
+                    if (prevRider != null) {
+                        prevRider.assignedVehicleId = null
+                        prevRider.status = "Available"
+                    }
+                    vehicle.assignedRiderId = null
+                    vehicle.status = "Available"
+
+                    updateOverviewStats()
+                    renderRidersList()
+                    renderVehiclesList()
+                    Toast.makeText(this, "Rider assignment cleared for vehicle ${vehicle.plateNumber}!", Toast.LENGTH_LONG).show()
+                } else {
+                    val prevV = vehiclesList.find { it.vehicleId == selectedRider.assignedVehicleId }
                     if (prevV != null) {
                         prevV.assignedRiderId = null
                         prevV.status = "Available"
                     }
 
-                    rider.assignedVehicleId = selectedV.vehicleId
-                    rider.status = "Active"
-                    selectedV.assignedRiderId = rider.riderId
-                    selectedV.status = "Assigned"
+                    selectedRider.assignedVehicleId = vehicle.vehicleId
+                    selectedRider.status = "On Delivery"
+                    vehicle.assignedRiderId = selectedRider.riderId
+                    vehicle.status = "In Use"
 
                     updateOverviewStats()
                     renderRidersList()
                     renderVehiclesList()
 
-                    Toast.makeText(this, "Vehicle ${selectedV.plateNumber} Assigned to ${rider.fullName}!", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Rider ${selectedRider.fullName} Assigned to Vehicle ${vehicle.plateNumber}!", Toast.LENGTH_LONG).show()
                 }
             }
             .setNegativeButton("Cancel", null)

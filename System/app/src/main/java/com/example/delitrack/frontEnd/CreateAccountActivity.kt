@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.text.InputType
 import android.widget.Button
 import android.widget.EditText
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -31,6 +33,10 @@ class CreateAccountActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        val roleRadioGroup = findViewById<RadioGroup>(R.id.roleRadioGroup)
+        val radioCustomer = findViewById<RadioButton>(R.id.radioCustomer)
+        val radioRider = findViewById<RadioButton>(R.id.radioRider)
 
         val fullNameField = findViewById<EditText>(R.id.fullNameField)
         val emailField = findViewById<EditText>(R.id.emailField)
@@ -69,6 +75,7 @@ class CreateAccountActivity : AppCompatActivity() {
         }
 
         createAccountBtn.setOnClickListener {
+            val selectedRole = if (radioRider.isChecked) "Rider" else "Customer"
             val name = fullNameField.text.toString().trim()
             val email = emailField.text.toString().trim()
             val phone = phoneField.text.toString().trim()
@@ -96,18 +103,35 @@ class CreateAccountActivity : AppCompatActivity() {
                     if (task.isSuccessful) {
                         val userId = auth.currentUser?.uid ?: email
                         val db = FirebaseFirestore.getInstance()
-                        // Automatically assign Customer role (never allow registering as Admin)
+
                         val userMap = hashMapOf(
                             "fullName" to name,
                             "email" to email,
                             "phone" to phone,
-                            "role" to "Customer"
+                            "role" to selectedRole
                         )
+
                         db.collection("users").document(userId)
                             .set(userMap)
                             .addOnSuccessListener {
+                                if (selectedRole == "Rider") {
+                                    // Also seed to riders fleet collection
+                                    val riderId = "RDR-${System.currentTimeMillis().toString().takeLast(4)}"
+                                    val riderMap = hashMapOf(
+                                        "riderId" to riderId,
+                                        "fullName" to name,
+                                        "phone" to phone,
+                                        "assignedVehicleId" to null,
+                                        "status" to "Available",
+                                        "email" to email,
+                                        "userId" to userId
+                                    )
+                                    db.collection("riders").document(riderId).set(riderMap)
+                                }
+
                                 createAccountBtn.isEnabled = true
-                                Toast.makeText(this, "Customer Account Created Successfully!", Toast.LENGTH_LONG).show()
+                                Toast.makeText(this, "$selectedRole Account Registered Successfully!", Toast.LENGTH_LONG).show()
+
                                 val intent = Intent(this, DashboardActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 startActivity(intent)

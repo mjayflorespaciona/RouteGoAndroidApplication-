@@ -39,16 +39,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Delivery Tracking"
+                android:text="Track My Package"
                 android:textColor="#111111"
-                android:textSize="16sp"
+                android:textSize="17sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvTrackingId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="DLV-1001"
+                android:text="DLV-XXXX"
                 android:textColor="#666666"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -70,19 +70,63 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Status Badge Header (Supports 5 Statuses: Pending, Confirmed, Assigned to Rider, In Transit, Delivered) -->
+            <!-- Search Field & Search Button Component -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/searchDeliveryIdField"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:drawable/editbox_background_normal"
+                    android:hint="Enter Delivery ID (e.g. DLV-1001)"
+                    android:inputType="textCapCharacters"
+                    android:paddingHorizontal="12dp"
+                    android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/btnSearchTracking"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:backgroundTint="#0B4F2C"
+                    android:text="Search"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Error / Privacy Warning Label -->
+            <TextView
+                android:id="@+id/tvTrackingError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="#FEE2E2"
+                android:padding="10dp"
+                android:text="Delivery ID not found or unauthorized access."
+                android:textColor="#DC2626"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <!-- Current Delivery Status Header -->
             <TextView
                 android:id="@+id/tvTrackingStatus"
                 android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:background="#E0F2FE"
+                android:layout_height="40dp"
+                android:layout_marginTop="12dp"
+                android:background="#FEF3C7"
                 android:gravity="center"
-                android:text="In Transit"
-                android:textColor="#0284C7"
-                android:textSize="14sp"
+                android:text="Status: Pending"
+                android:textColor="#D97706"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
-            <!-- Delivery Details Card -->
+            <!-- Delivery Progress Timeline Card -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -95,259 +139,304 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Delivery Details"
+                    android:text="Delivery Timeline Progress"
+                    android:textColor="#111111"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <!-- 5-Step Timeline Grid -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical">
+
+                    <!-- Step 1: Pending -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/stepPendingDot"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:background="@android:drawable/radiobutton_off_background"
+                            android:gravity="center"
+                            android:text="1"
+                            android:textColor="#555555"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/stepPendingText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="1. Pending"
+                            android:textColor="#111111"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <!-- Step 2: Confirmed -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/stepConfirmedDot"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:background="@android:drawable/radiobutton_off_background"
+                            android:gravity="center"
+                            android:text="2"
+                            android:textColor="#555555"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/stepConfirmedText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="2. Confirmed"
+                            android:textColor="#888888"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <!-- Step 3: Assigned to Rider -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/stepAssignedDot"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:background="@android:drawable/radiobutton_off_background"
+                            android:gravity="center"
+                            android:text="3"
+                            android:textColor="#555555"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/stepAssignedText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="3. Assigned to Rider"
+                            android:textColor="#888888"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <!-- Step 4: In Transit -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/stepInTransitDot"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:background="@android:drawable/radiobutton_off_background"
+                            android:gravity="center"
+                            android:text="4"
+                            android:textColor="#555555"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/stepInTransitText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="4. In Transit"
+                            android:textColor="#888888"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <!-- Step 5: Delivered -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/stepDeliveredDot"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:background="@android:drawable/radiobutton_off_background"
+                            android:gravity="center"
+                            android:text="5"
+                            android:textColor="#555555"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/stepDeliveredText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="5. Delivered"
+                            android:textColor="#888888"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Package & Route Information Card -->
+            <LinearLayout
+                android:id="@+id/cardPackageInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="#FFFFFF"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Package &amp; Route Information"
                     android:textColor="#111111"
                     android:textStyle="bold" />
 
-                <LinearLayout
+                <TextView
+                    android:id="@+id/tvPackageDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:orientation="horizontal">
+                    android:layout_marginTop="8dp"
+                    android:text="Package: Standard Box"
+                    android:textColor="#333333"
+                    android:textSize="13sp" />
 
-                    <TextView
-                        android:layout_width="24dp"
-                        android:layout_height="wrap_content"
-                        android:text="📍" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Pickup"
-                            android:textColor="#777777"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:id="@+id/tvPickupAddress"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Nasugbu, Batangas"
-                            android:textColor="#111111"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
+                <TextView
+                    android:id="@+id/tvPackageType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:orientation="horizontal">
+                    android:layout_marginTop="4dp"
+                    android:text="Type: Parcel"
+                    android:textColor="#555555"
+                    android:textSize="12sp" />
 
-                    <TextView
-                        android:layout_width="24dp"
-                        android:layout_height="wrap_content"
-                        android:text="🎯" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Destination"
-                            android:textColor="#777777"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:id="@+id/tvDestinationAddress"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Lian, Batangas"
-                            android:textColor="#111111"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
+                <TextView
+                    android:id="@+id/tvPickupAddress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:orientation="horizontal">
+                    android:layout_marginTop="8dp"
+                    android:text="Pickup: Nasugbu, Batangas"
+                    android:textColor="#111111"
+                    android:textSize="13sp" />
 
-                    <TextView
-                        android:layout_width="24dp"
-                        android:layout_height="wrap_content"
-                        android:text="👤" />
+                <TextView
+                    android:id="@+id/tvDestinationAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Destination: Lian, Batangas"
+                    android:textColor="#111111"
+                    android:textSize="13sp" />
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tvDeliveryNotes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Notes: Leave at front gate"
+                    android:textColor="#777777"
+                    android:textSize="12sp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Customer"
-                            android:textColor="#777777"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:id="@+id/tvCustomerInfo"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Juan Dela Cruz\n0917 555 1234"
-                            android:textColor="#111111"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </LinearLayout>
             </LinearLayout>
 
-            <!-- Rider Card -->
+            <!-- Assigned Rider Information Card (Visible when assigned) -->
             <LinearLayout
+                android:id="@+id/cardRiderInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:background="#FFFFFF"
                 android:elevation="2dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="gone">
 
                 <TextView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="#E5E7E6"
-                    android:gravity="center"
-                    android:text="👤"
-                    android:textSize="20sp" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Rider"
-                        android:textColor="#777777"
-                        android:textSize="11sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Mark Santos\n0917 123 4567"
-                        android:textColor="#111111"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
+                    android:text="Assigned Rider Information"
+                    android:textColor="#0B4F2C"
+                    android:textStyle="bold" />
 
                 <TextView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:background="#DCFCE7"
-                    android:gravity="center"
-                    android:text="📞"
-                    android:textSize="16sp" />
+                    android:id="@+id/tvRiderInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Rider: Mark Santos (0917 123 4567)"
+                    android:textColor="#111111"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvVehicleInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Vehicle: TRK-001 (Closed Van)"
+                    android:textColor="#555555"
+                    android:textSize="12sp" />
+
             </LinearLayout>
 
-            <!-- Vehicle Card -->
+            <!-- Estimated Delivery Date / ETA Card (Visible when provided by Admin) -->
             <LinearLayout
+                android:id="@+id/cardEtaInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:background="#FFFFFF"
+                android:background="#E8F5E9"
                 android:elevation="2dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="gone">
 
                 <TextView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="#E5E7E6"
-                    android:gravity="center"
-                    android:text="🚚"
-                    android:textSize="20sp" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Vehicle"
-                        android:textColor="#777777"
-                        android:textSize="11sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="TRK-001\nClosed Van"
-                        android:textColor="#111111"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
+                    android:text="Estimated Delivery Date &amp; ETA"
+                    android:textColor="#0B4F2C"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
 
                 <TextView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:background="#DCFCE7"
-                    android:gravity="center"
-                    android:text="📞"
-                    android:textSize="16sp" />
+                    android:id="@+id/tvEstimatedDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Est. Delivery: Today, 05:00 PM"
+                    android:textColor="#111111"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
             </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
-
-    <!-- ETA Footer Panel -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF"
-        android:elevation="8dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="16dp">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ETA"
-                android:textColor="#777777"
-                android:textSize="12sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="09:30 AM"
-                android:textColor="#111111"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nasugbu ➔ Lian Route"
-            android:textColor="#0B4F2C"
-            android:textStyle="bold" />
-    </LinearLayout>
 
 </LinearLayout>

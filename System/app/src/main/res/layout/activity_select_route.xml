@@ -20,6 +20,9 @@
             android:id="@+id/backBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp"
             android:text="←"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -29,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Select Route"
+            android:text="Delivery Route"
             android:textColor="#111111"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -50,6 +53,7 @@
         android:padding="16dp">
 
         <TextView
+            android:id="@+id/tvRouteTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Nasugbu ➔ Lian"
@@ -60,7 +64,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Batangas"
+            android:layout_marginTop="2dp"
+            android:text="Batangas Delivery Operation"
             android:textColor="#666666"
             android:textSize="13sp" />
     </LinearLayout>
@@ -73,7 +78,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_weight="1" />
 
-    <!-- Route Stats Card -->
+    <!-- Route Stats & Information Card -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -83,9 +88,29 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <TextView
+            android:id="@+id/tvPickupText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pickup: Nasugbu, Batangas"
+            android:textColor="#111111"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvDestinationText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Destination: Lian, Batangas"
+            android:textColor="#111111"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:baselineAligned="false"
             android:orientation="horizontal">
 
@@ -106,9 +131,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="25.6 km"
+                    android:text="15.2 km"
                     android:textColor="#111111"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -129,9 +154,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="45 min"
+                    android:text="35 min"
                     android:textColor="#111111"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -152,9 +177,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Light"
+                    android:text="Normal"
                     android:textColor="#16A34A"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
@@ -163,7 +188,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Route via Calayo Rd • Palico - Lian Hwy"
+            android:text="Route via Palico - Lian Hwy • Nasugbu - Lian Road"
             android:textColor="#555555"
             android:textSize="12sp" />
 
@@ -173,7 +198,7 @@
             android:layout_height="48dp"
             android:layout_marginTop="16dp"
             android:backgroundTint="#0B4F2C"
-            android:text="Use This Route"
+            android:text="Confirm Route"
             android:textColor="#FFFFFF"
             android:textStyle="bold" />
     </LinearLayout>

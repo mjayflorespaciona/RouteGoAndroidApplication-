@@ -30,27 +30,56 @@
             android:background="#E0F2FE"
             android:paddingHorizontal="8dp"
             android:paddingVertical="2dp"
-            android:text="In Transit"
+            android:text="Pending"
             android:textColor="#0284C7"
             android:textSize="11sp"
             android:textStyle="bold" />
     </LinearLayout>
 
     <TextView
-        android:id="@+id/tvDeliveryRoute"
+        android:id="@+id/tvReceiverName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
+        android:text="Receiver: Juan Dela Cruz"
+        android:textColor="#333333"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvPickupLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Pickup: Nasugbu, Batangas"
+        android:textColor="#555555"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tvDeliveryDestination"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Destination: Lian, Batangas"
+        android:textColor="#555555"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tvDeliveryRoute"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
         android:text="Nasugbu ➔ Lian"
         android:textColor="#555555"
-        android:textSize="13sp" />
+        android:textSize="12sp"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/tvDeliveryDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:text="Today, 08:45 AM"
+        android:layout_marginTop="4dp"
+        android:text="Date Created: Today"
         android:textColor="#888888"
         android:textSize="11sp" />
 </LinearLayout>

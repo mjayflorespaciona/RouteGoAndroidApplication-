@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E5E7E6"
+    android:background="#F5F7F6"
     android:orientation="vertical">
 
     <!-- Top Bar -->
@@ -15,27 +15,44 @@
         android:orientation="horizontal"
         android:paddingHorizontal="16dp">
 
-        <LinearLayout
+        <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:text="Track My Package"
+            android:textColor="#111111"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Route Map"
-                android:textColor="#111111"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+    <!-- Search Field & Search Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="DLV-1001"
-                android:textColor="#666666"
-                android:textSize="12sp" />
-        </LinearLayout>
+        <EditText
+            android:id="@+id/searchDeliveryIdField"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:drawable/editbox_background_normal"
+            android:hint="Enter Delivery ID (e.g. DLV-1001)"
+            android:inputType="textCapCharacters"
+            android:paddingHorizontal="12dp"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btnSearchMapTracking"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="#0B4F2C"
+            android:text="Track"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <!-- OpenStreetMap View -->
@@ -45,7 +62,7 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <!-- Bottom Stats Panel -->
+    <!-- Bottom Action Panel -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -69,7 +86,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Distance"
+                    android:text="Route Focus"
                     android:textColor="#777777"
                     android:textSize="12sp" />
 
@@ -77,9 +94,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="25.6 km"
-                    android:textColor="#111111"
-                    android:textSize="16sp"
+                    android:text="Nasugbu ➔ Lian"
+                    android:textColor="#0B4F2C"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -92,7 +109,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Est. Travel Time"
+                    android:text="Coverage"
                     android:textColor="#777777"
                     android:textSize="12sp" />
 
@@ -100,9 +117,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="45 min"
+                    android:text="Batangas Operations"
                     android:textColor="#111111"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
@@ -113,10 +130,9 @@
             android:layout_height="48dp"
             android:layout_marginTop="16dp"
             android:backgroundTint="#0B4F2C"
-            android:text="View Delivery Tracking"
+            android:text="View Full Tracking &amp; Timeline"
             android:textColor="#FFFFFF"
             android:textStyle="bold" />
     </LinearLayout>
 
 </LinearLayout>
-

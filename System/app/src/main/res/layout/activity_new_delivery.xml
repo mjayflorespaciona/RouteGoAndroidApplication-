@@ -56,38 +56,46 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Customer Name -->
+            <!-- Section 1: Sender Information -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Customer Name"
+                android:text="Sender Information"
+                android:textColor="#0B4F2C"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Sender Name *"
                 android:textColor="#333333"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/customerNameField"
+                android:id="@+id/senderNameField"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="4dp"
                 android:background="@android:drawable/editbox_background_normal"
-                android:hint="Enter customer name"
+                android:hint="Enter sender full name"
                 android:inputType="textPersonName"
                 android:paddingHorizontal="12dp"
                 android:textSize="14sp" />
 
-            <!-- Contact Number -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Contact Number"
+                android:layout_marginTop="10dp"
+                android:text="Contact Number *"
                 android:textColor="#333333"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/contactNumberField"
+                android:id="@+id/senderContactField"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="4dp"
@@ -97,12 +105,11 @@
                 android:paddingHorizontal="12dp"
                 android:textSize="14sp" />
 
-            <!-- Pickup Address (Nasugbu Focus) -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Pickup Address (Nasugbu, Batangas)"
+                android:layout_marginTop="10dp"
+                android:text="Pickup Address *"
                 android:textColor="#333333"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -117,12 +124,182 @@
                 android:paddingHorizontal="12dp"
                 android:textSize="14sp" />
 
-            <!-- Delivery Destination (Lian Focus) -->
+
+            <!-- Section 2: Receiver Information -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Delivery Destination (Lian, Batangas)"
+                android:layout_marginTop="18dp"
+                android:text="Receiver Information"
+                android:textColor="#0B4F2C"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Receiver Name *"
+                android:textColor="#333333"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/receiverNameField"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@android:drawable/editbox_background_normal"
+                android:hint="Enter receiver full name"
+                android:inputType="textPersonName"
+                android:paddingHorizontal="12dp"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Contact Number *"
+                android:textColor="#333333"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/receiverContactField"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@android:drawable/editbox_background_normal"
+                android:hint="0918 987 6543"
+                android:inputType="phone"
+                android:paddingHorizontal="12dp"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Delivery Address *"
+                android:textColor="#333333"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/deliveryAddressField"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@android:drawable/editbox_background_normal"
+                android:text="Lian, Batangas"
+                android:paddingHorizontal="12dp"
+                android:textSize="14sp" />
+
+
+            <!-- Section 3: Package Information -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="Package Information"
+                android:textColor="#0B4F2C"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Package Description *"
+                android:textColor="#333333"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/packageDescField"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@android:drawable/editbox_background_normal"
+                android:hint="e.g. Documents, Box, Electronics"
+                android:inputType="text"
+                android:paddingHorizontal="12dp"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Package Type"
+                android:textColor="#333333"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/packageTypeField"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@android:drawable/editbox_background_normal"
+                android:hint="e.g. Small Parcel / Standard / Fragile"
+                android:inputType="text"
+                android:paddingHorizontal="12dp"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Delivery Notes (Optional)"
+                android:textColor="#333333"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/deliveryNotesField"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@android:drawable/editbox_background_normal"
+                android:hint="Special instructions for delivery rider"
+                android:inputType="text"
+                android:paddingHorizontal="12dp"
+                android:textSize="14sp" />
+
+
+            <!-- Section 4: Delivery Information & Route -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="Delivery Information &amp; Route"
+                android:textColor="#0B4F2C"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Pickup Location"
+                android:textColor="#333333"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/pickupLocationField"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@android:drawable/editbox_background_normal"
+                android:text="Nasugbu, Batangas"
+                android:paddingHorizontal="12dp"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Destination (Route: Nasugbu - Lian)"
                 android:textColor="#333333"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -137,66 +314,22 @@
                 android:paddingHorizontal="12dp"
                 android:textSize="14sp" />
 
-            <!-- Package Description -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Package Description"
+                android:layout_marginTop="10dp"
+                android:text="Delivery Date"
                 android:textColor="#333333"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/packageDescField"
+                android:id="@+id/deliveryDateField"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="4dp"
                 android:background="@android:drawable/editbox_background_normal"
-                android:hint="e.g. Documents / Box / Fragile Item"
-                android:inputType="text"
-                android:paddingHorizontal="12dp"
-                android:textSize="14sp" />
-
-            <!-- Package Type -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Package Type"
-                android:textColor="#333333"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/packageTypeField"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="4dp"
-                android:background="@android:drawable/editbox_background_normal"
-                android:hint="e.g. Small Box / Documents"
-                android:inputType="text"
-                android:paddingHorizontal="12dp"
-                android:textSize="14sp" />
-
-            <!-- Delivery Notes -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Delivery Notes (Optional)"
-                android:textColor="#333333"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/deliveryNotesField"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="4dp"
-                android:background="@android:drawable/editbox_background_normal"
-                android:hint="Special instructions for rider"
-                android:inputType="text"
+                android:text="Today"
                 android:paddingHorizontal="12dp"
                 android:textSize="14sp" />
 

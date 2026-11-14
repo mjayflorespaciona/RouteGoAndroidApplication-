@@ -11,9 +11,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.delitrack.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -25,12 +26,17 @@ class DeliveriesFragment : Fragment() {
 
     private lateinit var btnFilterAll: Button
     private lateinit var btnFilterPending: Button
+    private lateinit var btnFilterConfirmed: Button
+    private lateinit var btnFilterAssigned: Button
     private lateinit var btnFilterInTransit: Button
     private lateinit var btnFilterDelivered: Button
     private lateinit var searchField: EditText
-    private lateinit var containerDeliveriesList: LinearLayout
+    private lateinit var recyclerViewDeliveries: RecyclerView
+    private lateinit var tvEmptyDeliveries: TextView
 
     private val allDeliveries = mutableListOf<Map<String, Any>>()
+    private val displayedDeliveries = mutableListOf<Map<String, Any>>()
+    private lateinit var deliveriesAdapter: DeliveriesAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,13 +50,27 @@ class DeliveriesFragment : Fragment() {
 
         btnFilterAll = view.findViewById(R.id.btnFilterAll)
         btnFilterPending = view.findViewById(R.id.btnFilterPending)
+        btnFilterConfirmed = view.findViewById(R.id.btnFilterConfirmed)
+        btnFilterAssigned = view.findViewById(R.id.btnFilterAssigned)
         btnFilterInTransit = view.findViewById(R.id.btnFilterInTransit)
         btnFilterDelivered = view.findViewById(R.id.btnFilterDelivered)
         searchField = view.findViewById(R.id.searchField)
-        containerDeliveriesList = view.findViewById(R.id.containerDeliveriesList)
+        recyclerViewDeliveries = view.findViewById(R.id.recyclerViewDeliveries)
+        tvEmptyDeliveries = view.findViewById(R.id.tvEmptyDeliveries)
+
+        recyclerViewDeliveries.layoutManager = LinearLayoutManager(requireContext())
+        deliveriesAdapter = DeliveriesAdapter(displayedDeliveries) { delivery ->
+            val deliveryId = delivery["deliveryId"] as? String ?: ""
+            val intent = Intent(requireContext(), DeliveryTrackingActivity::class.java)
+            intent.putExtra("deliveryId", deliveryId)
+            startActivity(intent)
+        }
+        recyclerViewDeliveries.adapter = deliveriesAdapter
 
         btnFilterAll.setOnClickListener { setFilter("All") }
         btnFilterPending.setOnClickListener { setFilter("Pending") }
+        btnFilterConfirmed.setOnClickListener { setFilter("Confirmed") }
+        btnFilterAssigned.setOnClickListener { setFilter("Assigned to Rider") }
         btnFilterInTransit.setOnClickListener { setFilter("In Transit") }
         btnFilterDelivered.setOnClickListener { setFilter("Delivered") }
 
@@ -58,7 +78,7 @@ class DeliveriesFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 searchQuery = s?.toString()?.trim() ?: ""
-                renderDeliveries()
+                filterAndRenderDeliveries()
             }
             override fun afterTextChanged(s: Editable?) {}
         })
@@ -69,7 +89,7 @@ class DeliveriesFragment : Fragment() {
     private fun setFilter(filter: String) {
         currentFilter = filter
         updateFilterButtonStyles()
-        renderDeliveries()
+        filterAndRenderDeliveries()
     }
 
     private fun updateFilterButtonStyles() {
@@ -78,17 +98,16 @@ class DeliveriesFragment : Fragment() {
         val activeText = Color.WHITE
         val inactiveText = Color.parseColor("#555555")
 
-        btnFilterAll.backgroundTintList = if (currentFilter == "All") activeBg else inactiveBg
-        btnFilterAll.setTextColor(if (currentFilter == "All") activeText else inactiveText)
+        val buttons = listOf(btnFilterAll, btnFilterPending, btnFilterConfirmed, btnFilterAssigned, btnFilterInTransit, btnFilterDelivered)
+        val filters = listOf("All", "Pending", "Confirmed", "Assigned to Rider", "In Transit", "Delivered")
 
-        btnFilterPending.backgroundTintList = if (currentFilter == "Pending") activeBg else inactiveBg
-        btnFilterPending.setTextColor(if (currentFilter == "Pending") activeText else inactiveText)
-
-        btnFilterInTransit.backgroundTintList = if (currentFilter == "In Transit") activeBg else inactiveBg
-        btnFilterInTransit.setTextColor(if (currentFilter == "In Transit") activeText else inactiveText)
-
-        btnFilterDelivered.backgroundTintList = if (currentFilter == "Delivered") activeBg else inactiveBg
-        btnFilterDelivered.setTextColor(if (currentFilter == "Delivered") activeText else inactiveText)
+        for (i in buttons.indices) {
+            val btn = buttons[i]
+            val f = filters[i]
+            val isActive = (currentFilter == f)
+            btn.backgroundTintList = if (isActive) activeBg else inactiveBg
+            btn.setTextColor(if (isActive) activeText else inactiveText)
+        }
     }
 
     private fun loadDeliveries() {
@@ -105,31 +124,38 @@ class DeliveriesFragment : Fragment() {
                 for (document in result) {
                     val data = document.data
                     val custId = data["customerId"] as? String ?: ""
-                    if (custId.isEmpty() || custId == userId || currentUser?.email == "admin@delitrack.com") {
+                    val custEmail = data["customerEmail"] as? String ?: ""
+
+                    // Display only deliveries belonging to the logged-in customer (or fallback/admin if testing)
+                    val isOwner = (custId == userId) || (currentUser?.email != null && custEmail.equals(currentUser.email, ignoreCase = true))
+                    val isDemoOrLegacy = custId.isEmpty() && currentUser?.email == "admin@delitrack.com"
+
+                    if (isOwner || isDemoOrLegacy) {
                         allDeliveries.add(data)
                     }
                 }
-                renderDeliveries()
+                filterAndRenderDeliveries()
             }
             .addOnFailureListener {
-                // handle failure
+                // handle failure gracefully
             }
     }
 
-    private fun renderDeliveries() {
+    private fun filterAndRenderDeliveries() {
         if (!isAdded) return
-        containerDeliveriesList.removeAllViews()
 
         val filtered = allDeliveries.filter { data ->
             val status = data["status"] as? String ?: "Pending"
             val deliveryId = (data["deliveryId"] as? String ?: "").lowercase()
-            val pickup = (data["pickupAddress"] as? String ?: "").lowercase()
-            val dest = (data["destination"] as? String ?: "").lowercase()
-            val customer = (data["customerName"] as? String ?: "").lowercase()
+            val pickup = (data["pickupAddress"] as? String ?: data["pickupLocation"] as? String ?: "").lowercase()
+            val dest = (data["destination"] as? String ?: data["deliveryAddress"] as? String ?: "").lowercase()
+            val receiver = (data["receiverName"] as? String ?: data["customerName"] as? String ?: "").lowercase()
 
             val matchesFilter = when (currentFilter) {
                 "All" -> true
                 "Pending" -> status.equals("Pending", ignoreCase = true)
+                "Confirmed" -> status.equals("Confirmed", ignoreCase = true)
+                "Assigned to Rider" -> status.equals("Assigned to Rider", ignoreCase = true) || status.equals("Assigned", ignoreCase = true)
                 "In Transit" -> status.equals("In Transit", ignoreCase = true) || status.equals("Dispatched", ignoreCase = true) || status.equals("Active", ignoreCase = true)
                 "Delivered" -> status.equals("Delivered", ignoreCase = true) || status.equals("Completed", ignoreCase = true)
                 else -> true
@@ -139,66 +165,100 @@ class DeliveriesFragment : Fragment() {
                     deliveryId.contains(searchQuery.lowercase()) ||
                     pickup.contains(searchQuery.lowercase()) ||
                     dest.contains(searchQuery.lowercase()) ||
-                    customer.contains(searchQuery.lowercase()) ||
+                    receiver.contains(searchQuery.lowercase()) ||
                     status.contains(searchQuery.lowercase())
 
             matchesFilter && matchesSearch
         }
 
-        if (filtered.isEmpty()) {
-            val emptyTv = TextView(requireContext()).apply {
-                text = "No deliveries match your filter or search."
-                setPadding(16, 32, 16, 16)
-                setTextColor(resources.getColor(android.R.color.darker_gray, null))
-            }
-            containerDeliveriesList.addView(emptyTv)
-            return
-        }
+        displayedDeliveries.clear()
+        displayedDeliveries.addAll(filtered)
+        deliveriesAdapter.notifyDataSetChanged()
 
-        for (data in filtered) {
-            val deliveryId = data["deliveryId"] as? String ?: "DLV-XXXX"
-            val status = data["status"] as? String ?: "Pending"
-            val pickup = data["pickupAddress"] as? String ?: "Nasugbu"
-            val dest = data["destination"] as? String ?: "Lian"
-            val date = data["dateCreated"] as? String ?: "Today"
-
-            val cardView = layoutInflater.inflate(R.layout.item_delivery_card_snippet, containerDeliveriesList, false) as? LinearLayout
-            if (cardView != null) {
-                cardView.findViewById<TextView>(R.id.tvDeliveryId)?.text = deliveryId
-                val tvStatus = cardView.findViewById<TextView>(R.id.tvDeliveryStatus)
-                tvStatus?.text = status
-
-                when (status.lowercase()) {
-                    "in transit", "dispatched", "active" -> {
-                        tvStatus?.setBackgroundColor(0xFFE0F2FE.toInt())
-                        tvStatus?.setTextColor(0xFF0284C7.toInt())
-                    }
-                    "pending" -> {
-                        tvStatus?.setBackgroundColor(0xFFFEF3C7.toInt())
-                        tvStatus?.setTextColor(0xFFD97706.toInt())
-                    }
-                    "delivered", "completed" -> {
-                        tvStatus?.setBackgroundColor(0xFFDCFCE7.toInt())
-                        tvStatus?.setTextColor(0xFF16A34A.toInt())
-                    }
-                }
-
-                cardView.findViewById<TextView>(R.id.tvDeliveryRoute)?.text = "$pickup ➔ $dest"
-                cardView.findViewById<TextView>(R.id.tvDeliveryDate)?.text = date
-
-                cardView.setOnClickListener {
-                    val intent = Intent(requireContext(), DeliveryTrackingActivity::class.java)
-                    intent.putExtra("deliveryId", deliveryId)
-                    startActivity(intent)
-                }
-
-                containerDeliveriesList.addView(cardView)
-            }
+        if (displayedDeliveries.isEmpty()) {
+            tvEmptyDeliveries.visibility = View.VISIBLE
+            recyclerViewDeliveries.visibility = View.GONE
+        } else {
+            tvEmptyDeliveries.visibility = View.GONE
+            recyclerViewDeliveries.visibility = View.VISIBLE
         }
     }
 
     override fun onResume() {
         super.onResume()
         loadDeliveries()
+    }
+
+    // RecyclerView Adapter for Deliveries
+    class DeliveriesAdapter(
+        private val deliveries: List<Map<String, Any>>,
+        private val onItemClick: (Map<String, Any>) -> Unit
+    ) : RecyclerView.Adapter<DeliveriesAdapter.DeliveryViewHolder>() {
+
+        class DeliveryViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val tvDeliveryId: TextView = view.findViewById(R.id.tvDeliveryId)
+            val tvDeliveryStatus: TextView = view.findViewById(R.id.tvDeliveryStatus)
+            val tvReceiverName: TextView = view.findViewById(R.id.tvReceiverName)
+            val tvPickupLocation: TextView = view.findViewById(R.id.tvPickupLocation)
+            val tvDeliveryDestination: TextView = view.findViewById(R.id.tvDeliveryDestination)
+            val tvDeliveryDate: TextView = view.findViewById(R.id.tvDeliveryDate)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeliveryViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_delivery_card_snippet, parent, false)
+            return DeliveryViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: DeliveryViewHolder, position: Int) {
+            val data = deliveries[position]
+            val deliveryId = data["deliveryId"] as? String ?: "DLV-XXXX"
+            val status = data["status"] as? String ?: "Pending"
+            val receiver = data["receiverName"] as? String ?: data["customerName"] as? String ?: "N/A"
+            val pickup = data["pickupAddress"] as? String ?: data["pickupLocation"] as? String ?: "Nasugbu, Batangas"
+            val dest = data["destination"] as? String ?: data["deliveryAddress"] as? String ?: "Lian, Batangas"
+            val date = data["dateCreated"] as? String ?: "Today"
+
+            holder.tvDeliveryId.text = deliveryId
+            holder.tvDeliveryStatus.text = status
+            holder.tvReceiverName.text = "Receiver: $receiver"
+            holder.tvPickupLocation.text = "Pickup: $pickup"
+            holder.tvDeliveryDestination.text = "Destination: $dest"
+            holder.tvDeliveryDate.text = "Date Created: $date"
+
+            // Status badge color coding
+            when (status.lowercase()) {
+                "in transit", "dispatched", "active" -> {
+                    holder.tvDeliveryStatus.setBackgroundColor(0xFFE0F2FE.toInt())
+                    holder.tvDeliveryStatus.setTextColor(0xFF0284C7.toInt())
+                }
+                "pending" -> {
+                    holder.tvDeliveryStatus.setBackgroundColor(0xFFFEF3C7.toInt())
+                    holder.tvDeliveryStatus.setTextColor(0xFFD97706.toInt())
+                }
+                "confirmed" -> {
+                    holder.tvDeliveryStatus.setBackgroundColor(0xFFE8F5E9.toInt())
+                    holder.tvDeliveryStatus.setTextColor(0xFF2E7D32.toInt())
+                }
+                "assigned to rider", "assigned" -> {
+                    holder.tvDeliveryStatus.setBackgroundColor(0xFFF3E5F5.toInt())
+                    holder.tvDeliveryStatus.setTextColor(0xFF7B1FA2.toInt())
+                }
+                "delivered", "completed" -> {
+                    holder.tvDeliveryStatus.setBackgroundColor(0xFFDCFCE7.toInt())
+                    holder.tvDeliveryStatus.setTextColor(0xFF16A34A.toInt())
+                }
+                else -> {
+                    holder.tvDeliveryStatus.setBackgroundColor(0xFFE5E7E6.toInt())
+                    holder.tvDeliveryStatus.setTextColor(0xFF555555.toInt())
+                }
+            }
+
+            holder.itemView.setOnClickListener {
+                onItemClick(data)
+            }
+        }
+
+        override fun getItemCount() = deliveries.size
     }
 }

@@ -1,15 +1,62 @@
 package com.example.delitrack.frontEnd
 
+import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.delitrack.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 
 class DeliveryTrackingActivity : AppCompatActivity() {
+
+    private lateinit var searchDeliveryIdField: EditText
+    private lateinit var btnSearchTracking: Button
+    private lateinit var tvTrackingId: TextView
+    private lateinit var tvTrackingStatus: TextView
+    private lateinit var tvTrackingError: TextView
+
+    // Timeline elements
+    private lateinit var stepPendingDot: TextView
+    private lateinit var stepPendingText: TextView
+    private lateinit var stepConfirmedDot: TextView
+    private lateinit var stepConfirmedText: TextView
+    private lateinit var stepAssignedDot: TextView
+    private lateinit var stepAssignedText: TextView
+    private lateinit var stepInTransitDot: TextView
+    private lateinit var stepInTransitText: TextView
+    private lateinit var stepDeliveredDot: TextView
+    private lateinit var stepDeliveredText: TextView
+
+    // Package Info elements
+    private lateinit var cardPackageInfo: LinearLayout
+    private lateinit var tvPackageDescription: TextView
+    private lateinit var tvPackageType: TextView
+    private lateinit var tvPickupAddress: TextView
+    private lateinit var tvDestinationAddress: TextView
+    private lateinit var tvDeliveryNotes: TextView
+
+    // Rider & ETA Cards
+    private lateinit var cardRiderInfo: LinearLayout
+    private lateinit var tvRiderInfo: TextView
+    private lateinit var tvVehicleInfo: TextView
+    private lateinit var cardEtaInfo: LinearLayout
+    private lateinit var tvEstimatedDate: TextView
+
+    private var trackingListener: ListenerRegistration? = null
+    private val db = FirebaseFirestore.getInstance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -21,34 +68,215 @@ class DeliveryTrackingActivity : AppCompatActivity() {
             insets
         }
 
-        findViewById<TextView>(R.id.backBtn).setOnClickListener {
-            finish()
+        findViewById<TextView>(R.id.backBtn).setOnClickListener { finish() }
+
+        searchDeliveryIdField = findViewById(R.id.searchDeliveryIdField)
+        btnSearchTracking = findViewById(R.id.btnSearchTracking)
+        tvTrackingId = findViewById(R.id.tvTrackingId)
+        tvTrackingStatus = findViewById(R.id.tvTrackingStatus)
+        tvTrackingError = findViewById(R.id.tvTrackingError)
+
+        stepPendingDot = findViewById(R.id.stepPendingDot)
+        stepPendingText = findViewById(R.id.stepPendingText)
+        stepConfirmedDot = findViewById(R.id.stepConfirmedDot)
+        stepConfirmedText = findViewById(R.id.stepConfirmedText)
+        stepAssignedDot = findViewById(R.id.stepAssignedDot)
+        stepAssignedText = findViewById(R.id.stepAssignedText)
+        stepInTransitDot = findViewById(R.id.stepInTransitDot)
+        stepInTransitText = findViewById(R.id.stepInTransitText)
+        stepDeliveredDot = findViewById(R.id.stepDeliveredDot)
+        stepDeliveredText = findViewById(R.id.stepDeliveredText)
+
+        cardPackageInfo = findViewById(R.id.cardPackageInfo)
+        tvPackageDescription = findViewById(R.id.tvPackageDescription)
+        tvPackageType = findViewById(R.id.tvPackageType)
+        tvPickupAddress = findViewById(R.id.tvPickupAddress)
+        tvDestinationAddress = findViewById(R.id.tvDestinationAddress)
+        tvDeliveryNotes = findViewById(R.id.tvDeliveryNotes)
+
+        cardRiderInfo = findViewById(R.id.cardRiderInfo)
+        tvRiderInfo = findViewById(R.id.tvRiderInfo)
+        tvVehicleInfo = findViewById(R.id.tvVehicleInfo)
+        cardEtaInfo = findViewById(R.id.cardEtaInfo)
+        tvEstimatedDate = findViewById(R.id.tvEstimatedDate)
+
+        val initialDeliveryId = intent.getStringExtra("deliveryId") ?: "DLV-1001"
+        searchDeliveryIdField.setText(initialDeliveryId)
+        startTracking(initialDeliveryId)
+
+        btnSearchTracking.setOnClickListener {
+            val queryId = searchDeliveryIdField.text.toString().trim()
+            if (queryId.isEmpty()) {
+                Toast.makeText(this, "Please enter a Delivery ID", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            startTracking(queryId)
+        }
+    }
+
+    private fun startTracking(deliveryId: String) {
+        trackingListener?.remove()
+        tvTrackingId.text = deliveryId
+        tvTrackingError.visibility = View.GONE
+
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val userId = currentUser?.uid ?: ""
+        val userEmail = currentUser?.email ?: ""
+
+        // Real-time snapshot listener so Admin status updates update customer tracking live
+        trackingListener = db.collection("deliveries").document(deliveryId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null || snapshot == null || !snapshot.exists()) {
+                    showError("Delivery ID $deliveryId not found.")
+                    return@addSnapshotListener
+                }
+
+                val data = snapshot.data ?: return@addSnapshotListener
+                val custId = data["customerId"] as? String ?: ""
+                val custEmail = data["customerEmail"] as? String ?: ""
+
+                // Customer Privacy Check: Ensure record belongs to logged-in user (or admin)
+                val isOwner = (custId.isEmpty() && userEmail == "admin@delitrack.com") ||
+                        (custId == userId) ||
+                        (userEmail.isNotEmpty() && custEmail.equals(userEmail, ignoreCase = true)) ||
+                        (userEmail == "admin@delitrack.com")
+
+                if (!isOwner) {
+                    showError("Access Denied: You can only track your own deliveries.")
+                    return@addSnapshotListener
+                }
+
+                tvTrackingError.visibility = View.GONE
+                cardPackageInfo.visibility = View.VISIBLE
+                updateTrackingUI(data)
+            }
+    }
+
+    private fun showError(message: String) {
+        tvTrackingError.text = message
+        tvTrackingError.visibility = View.VISIBLE
+        cardPackageInfo.visibility = View.GONE
+        cardRiderInfo.visibility = View.GONE
+        cardEtaInfo.visibility = View.GONE
+        tvTrackingStatus.text = "Status: Unknown"
+        tvTrackingStatus.setBackgroundColor(0xFFE5E7E6.toInt())
+        tvTrackingStatus.setTextColor(0xFF555555.toInt())
+        resetTimeline()
+    }
+
+    private fun updateTrackingUI(data: Map<String, Any>) {
+        val status = data["status"] as? String ?: "Pending"
+        val packageDesc = data["packageDescription"] as? String ?: "Standard Parcel"
+        val packageType = data["packageType"] as? String ?: "Standard"
+        val pickup = data["pickupAddress"] as? String ?: data["pickupLocation"] as? String ?: "Nasugbu, Batangas"
+        val destination = data["destination"] as? String ?: data["deliveryAddress"] as? String ?: "Lian, Batangas"
+        val notes = data["deliveryNotes"] as? String ?: "None"
+
+        val riderName = data["assignedRiderName"] as? String ?: data["riderName"] as? String
+        val riderContact = data["assignedRiderContact"] as? String ?: data["riderContact"] as? String
+        val vehicleInfo = data["assignedVehicle"] as? String ?: data["vehicleInfo"] as? String
+        val eta = data["estimatedDeliveryDate"] as? String ?: data["eta"] as? String
+
+        tvTrackingStatus.text = "Status: $status"
+        updateStatusBadgeColor(status)
+
+        tvPackageDescription.text = "Package Description: $packageDesc"
+        tvPackageType.text = "Package Type: $packageType"
+        tvPickupAddress.text = "Pickup Location: $pickup"
+        tvDestinationAddress.text = "Destination: $destination"
+        tvDeliveryNotes.text = "Delivery Notes: $notes"
+
+        // Update 5-Step Timeline
+        updateTimelineProgress(status)
+
+        // Assigned Rider Information (when available)
+        if (!riderName.isNullOrEmpty()) {
+            cardRiderInfo.visibility = View.VISIBLE
+            tvRiderInfo.text = "Rider: $riderName ${if (!riderContact.isNullOrEmpty()) "($riderContact)" else ""}"
+            tvVehicleInfo.text = "Vehicle: ${vehicleInfo ?: "Assigned Vehicle"}"
+        } else {
+            cardRiderInfo.visibility = View.GONE
         }
 
-        val deliveryId = intent.getStringExtra("deliveryId") ?: "DLV-1001"
-        findViewById<TextView>(R.id.tvTrackingId).text = deliveryId
+        // Estimated Delivery Date / ETA (only when provided by Admin)
+        if (!eta.isNullOrEmpty()) {
+            cardEtaInfo.visibility = View.VISIBLE
+            tvEstimatedDate.text = "Est. Delivery: $eta"
+        } else {
+            cardEtaInfo.visibility = View.GONE
+        }
+    }
 
-        val tvTrackingStatus = findViewById<TextView>(R.id.tvTrackingStatus)
-        val tvPickupAddress = findViewById<TextView>(R.id.tvPickupAddress)
-        val tvDestinationAddress = findViewById<TextView>(R.id.tvDestinationAddress)
-        val tvCustomerInfo = findViewById<TextView>(R.id.tvCustomerInfo)
-
-        val db = FirebaseFirestore.getInstance()
-        db.collection("deliveries").document(deliveryId)
-            .get()
-            .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    val status = document.getString("status") ?: "In Transit"
-                    val customer = document.getString("customerName") ?: "Juan Dela Cruz"
-                    val contact = document.getString("contactNumber") ?: "0917 555 1234"
-                    val pickup = document.getString("pickupAddress") ?: "Nasugbu, Batangas"
-                    val destination = document.getString("destination") ?: "Lian, Batangas"
-
-                    tvTrackingStatus.text = status
-                    tvPickupAddress.text = pickup
-                    tvDestinationAddress.text = destination
-                    tvCustomerInfo.text = "$customer\n$contact"
-                }
+    private fun updateStatusBadgeColor(status: String) {
+        when (status.lowercase()) {
+            "pending" -> {
+                tvTrackingStatus.setBackgroundColor(0xFFFEF3C7.toInt())
+                tvTrackingStatus.setTextColor(0xFFD97706.toInt())
             }
+            "confirmed" -> {
+                tvTrackingStatus.setBackgroundColor(0xFFE8F5E9.toInt())
+                tvTrackingStatus.setTextColor(0xFF2E7D32.toInt())
+            }
+            "assigned to rider", "assigned" -> {
+                tvTrackingStatus.setBackgroundColor(0xFFF3E5F5.toInt())
+                tvTrackingStatus.setTextColor(0xFF7B1FA2.toInt())
+            }
+            "in transit", "dispatched", "active" -> {
+                tvTrackingStatus.setBackgroundColor(0xFFE0F2FE.toInt())
+                tvTrackingStatus.setTextColor(0xFF0284C7.toInt())
+            }
+            "delivered", "completed" -> {
+                tvTrackingStatus.setBackgroundColor(0xFFDCFCE7.toInt())
+                tvTrackingStatus.setTextColor(0xFF16A34A.toInt())
+            }
+            else -> {
+                tvTrackingStatus.setBackgroundColor(0xFFE5E7E6.toInt())
+                tvTrackingStatus.setTextColor(0xFF555555.toInt())
+            }
+        }
+    }
+
+    private fun updateTimelineProgress(status: String) {
+        val level = when (status.lowercase()) {
+            "pending" -> 1
+            "confirmed" -> 2
+            "assigned to rider", "assigned" -> 3
+            "in transit", "dispatched", "active" -> 4
+            "delivered", "completed" -> 5
+            else -> 1
+        }
+
+        setStepState(stepPendingDot, stepPendingText, level >= 1)
+        setStepState(stepConfirmedDot, stepConfirmedText, level >= 2)
+        setStepState(stepAssignedDot, stepAssignedText, level >= 3)
+        setStepState(stepInTransitDot, stepInTransitText, level >= 4)
+        setStepState(stepDeliveredDot, stepDeliveredText, level >= 5)
+    }
+
+    private fun resetTimeline() {
+        setStepState(stepPendingDot, stepPendingText, false)
+        setStepState(stepConfirmedDot, stepConfirmedText, false)
+        setStepState(stepAssignedDot, stepAssignedText, false)
+        setStepState(stepInTransitDot, stepInTransitText, false)
+        setStepState(stepDeliveredDot, stepDeliveredText, false)
+    }
+
+    private fun setStepState(dot: TextView, label: TextView, isCompleted: Boolean) {
+        if (isCompleted) {
+            dot.setBackgroundColor(0xFF0B4F2C.toInt())
+            dot.setTextColor(Color.WHITE)
+            label.setTextColor(Color.parseColor("#111111"))
+            label.setTypeface(null, Typeface.BOLD)
+        } else {
+            dot.setBackgroundColor(0xFFE5E7E6.toInt())
+            dot.setTextColor(Color.parseColor("#555555"))
+            label.setTextColor(Color.parseColor("#888888"))
+            label.setTypeface(null, Typeface.NORMAL)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        trackingListener?.remove()
     }
 }
