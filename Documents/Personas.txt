@@ -1,0 +1,29 @@
+DELITRACK
+USER ROLES AND RESPONSIBILITIES
+
+1. Customer
+          - Places a delivery order.
+          - Provides pickup and delivery addresses.
+          - Checks delivery status.
+          - Tracks the parcel.
+          - Receives delivery updates.
+          - Confirms receipt of the parcel.
+
+2. Rider
+          - Views assigned deliveries.
+          - Views the Nasugbu–Lian delivery route.
+          - Shares GPS location during active deliveries.
+          - Updates delivery status.
+          - Reports delivery problems.
+          - Marks parcels as delivered or unsuccessful.
+
+3. Admin
+          - Manages customer and rider accounts          .
+          - Receives and manages delivery orders.
+          - Assigns riders and vehicles.
+          - Manages vehicle information and availability.
+          - Views GIS maps and the Nasugbu–Lian route.
+          - Monitors rider GPS locations.
+          - Monitors delivery progress and assignments.
+          - Manages pickup and delivery locations.
+          - Views delivery reports and rider performance.
