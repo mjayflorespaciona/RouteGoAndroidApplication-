@@ -20,6 +20,8 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.delitrack.R
 import com.example.delitrack.backEnd.data.Rider
 import com.example.delitrack.backEnd.data.Vehicle
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class AssignRiderVehicleActivity : AppCompatActivity() {
 
@@ -103,6 +105,20 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        // Admin Security Guard
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null && !currentUser.email.equals("admin@delitrack.com", ignoreCase = true)) {
+            FirebaseFirestore.getInstance().collection("users").document(currentUser.uid)
+                .get()
+                .addOnSuccessListener { doc ->
+                    val role = doc.getString("role") ?: "Customer"
+                    if (!role.equals("Admin", ignoreCase = true)) {
+                        Toast.makeText(this, "Access Denied: Admin privileges required", Toast.LENGTH_LONG).show()
+                        finish()
+                    }
+                }
         }
 
         findViewById<TextView>(R.id.backBtn).setOnClickListener { finish() }
@@ -436,10 +452,14 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
                 val lp = LinearLayout.LayoutParams(0, 90, 1f)
                 layoutParams = lp
                 setOnClickListener {
-                    val prevV = vehiclesList.find { it.vehicleId == rider.assignedVehicleId }
-                    if (prevV != null) {
-                        prevV.assignedRiderId = null
-                        prevV.status = "Available"
+                    // Active delivery & vehicle assignment deletion guard
+                    if (rider.status.equals("On Delivery", ignoreCase = true) || rider.assignedVehicleId != null) {
+                        AlertDialog.Builder(this@AssignRiderVehicleActivity)
+                            .setTitle("Cannot Delete Rider!")
+                            .setMessage("Rider ${rider.fullName} currently has active deliveries or an assigned vehicle (${rider.assignedVehicleId ?: ""}). Please resolve active assignments before deleting.")
+                            .setPositiveButton("OK", null)
+                            .show()
+                        return@setOnClickListener
                     }
 
                     ridersList.remove(rider)
@@ -617,10 +637,14 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
                 val lp = LinearLayout.LayoutParams(0, 90, 1f)
                 layoutParams = lp
                 setOnClickListener {
-                    val prevRider = ridersList.find { it.riderId == vehicle.assignedRiderId }
-                    if (prevRider != null) {
-                        prevRider.assignedVehicleId = null
-                        prevRider.status = "Available"
+                    // Active delivery & assignment deletion guard
+                    if (vehicle.status.equals("In Use", ignoreCase = true) || vehicle.assignedRiderId != null) {
+                        AlertDialog.Builder(this@AssignRiderVehicleActivity)
+                            .setTitle("Cannot Delete Vehicle!")
+                            .setMessage("Vehicle ${vehicle.plateNumber} is currently in use or assigned to an active delivery (${vehicle.assignedRiderId ?: ""}). Please resolve active deliveries before deleting.")
+                            .setPositiveButton("OK", null)
+                            .show()
+                        return@setOnClickListener
                     }
 
                     vehiclesList.remove(vehicle)
@@ -649,9 +673,11 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
 
         val nameInput = EditText(this).apply { hint = "Full Name" }
         val phoneInput = EditText(this).apply { hint = "Phone Number" }
+        val emailInput = EditText(this).apply { hint = "Email Address (Optional)" }
 
         layout.addView(nameInput)
         layout.addView(phoneInput)
+        layout.addView(emailInput)
 
         AlertDialog.Builder(this)
             .setTitle("Add New Rider")
@@ -659,14 +685,15 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
             .setPositiveButton("Add") { _, _ ->
                 val name = nameInput.text.toString().trim()
                 val phone = phoneInput.text.toString().trim()
+                val email = emailInput.text.toString().trim()
                 if (name.isNotEmpty() && phone.isNotEmpty()) {
                     val newId = "RDR-${System.currentTimeMillis().toString().takeLast(4)}"
-                    ridersList.add(Rider(newId, name, phone, null, "Available"))
+                    ridersList.add(Rider(newId, name, phone, null, "Available", email))
                     updateOverviewStats()
                     renderRidersList()
                     Toast.makeText(this, "Rider $name Added Successfully!", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(this, "Please enter all fields", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Please enter required fields", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancel", null)
@@ -681,9 +708,11 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
 
         val nameInput = EditText(this).apply { setText(rider.fullName) }
         val phoneInput = EditText(this).apply { setText(rider.phone) }
+        val emailInput = EditText(this).apply { setText(rider.email) }
 
         layout.addView(nameInput)
         layout.addView(phoneInput)
+        layout.addView(emailInput)
 
         AlertDialog.Builder(this)
             .setTitle("Edit Rider Details")
@@ -691,9 +720,11 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
             .setPositiveButton("Save") { _, _ ->
                 val name = nameInput.text.toString().trim()
                 val phone = phoneInput.text.toString().trim()
+                val email = emailInput.text.toString().trim()
                 if (name.isNotEmpty() && phone.isNotEmpty()) {
                     rider.fullName = name
                     rider.phone = phone
+                    rider.email = email
                     renderRidersList()
                     Toast.makeText(this, "Rider Updated!", Toast.LENGTH_SHORT).show()
                 }
@@ -710,9 +741,13 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
 
         val plateInput = EditText(this).apply { hint = "Plate Number (e.g. ABC-123)" }
         val typeInput = EditText(this).apply { hint = "Type (Motorcycle / Delivery Van)" }
+        val weightInput = EditText(this).apply { hint = "Max Cargo Weight in kg (e.g. 50)" }
+        val capacityInput = EditText(this).apply { hint = "Cargo Dimensions / Capacity" }
 
         layout.addView(plateInput)
         layout.addView(typeInput)
+        layout.addView(weightInput)
+        layout.addView(capacityInput)
 
         AlertDialog.Builder(this)
             .setTitle("Add New Vehicle")
@@ -720,6 +755,9 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
             .setPositiveButton("Add") { _, _ ->
                 val plate = plateInput.text.toString().trim()
                 val type = typeInput.text.toString().trim()
+                val maxW = weightInput.text.toString().trim().toDoubleOrNull() ?: 50.0
+                val cap = capacityInput.text.toString().trim().ifEmpty { "Standard Box" }
+
                 if (plate.isNotEmpty() && type.isNotEmpty()) {
                     val isDuplicate = vehiclesList.any { it.plateNumber.equals(plate, ignoreCase = true) }
                     if (isDuplicate) {
@@ -729,12 +767,12 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
 
                     val newId = "VHC-${System.currentTimeMillis().toString().takeLast(4)}"
                     val finalType = if (type.lowercase().contains("van")) "Delivery Van" else "Motorcycle"
-                    vehiclesList.add(Vehicle(newId, plate, finalType, null, "Available"))
+                    vehiclesList.add(Vehicle(newId, plate, finalType, null, "Available", maxW, cap))
                     updateOverviewStats()
                     renderVehiclesList()
                     Toast.makeText(this, "Vehicle $plate Added Successfully!", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(this, "Please enter all fields", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Please enter required fields", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancel", null)
@@ -749,9 +787,13 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
 
         val plateInput = EditText(this).apply { setText(vehicle.plateNumber) }
         val typeInput = EditText(this).apply { setText(vehicle.vehicleType) }
+        val weightInput = EditText(this).apply { setText(vehicle.maxWeightKg.toString()) }
+        val capacityInput = EditText(this).apply { setText(vehicle.cargoCapacity) }
 
         layout.addView(plateInput)
         layout.addView(typeInput)
+        layout.addView(weightInput)
+        layout.addView(capacityInput)
 
         AlertDialog.Builder(this)
             .setTitle("Edit Vehicle Details")
@@ -759,6 +801,9 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
             .setPositiveButton("Save") { _, _ ->
                 val plate = plateInput.text.toString().trim()
                 val type = typeInput.text.toString().trim()
+                val maxW = weightInput.text.toString().trim().toDoubleOrNull() ?: vehicle.maxWeightKg
+                val cap = capacityInput.text.toString().trim().ifEmpty { vehicle.cargoCapacity }
+
                 if (plate.isNotEmpty() && type.isNotEmpty()) {
                     val isDuplicate = vehiclesList.any { 
                         it.vehicleId != vehicle.vehicleId && it.plateNumber.equals(plate, ignoreCase = true) 
@@ -770,6 +815,8 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
 
                     vehicle.plateNumber = plate
                     vehicle.vehicleType = if (type.lowercase().contains("van")) "Delivery Van" else "Motorcycle"
+                    vehicle.maxWeightKg = maxW
+                    vehicle.cargoCapacity = cap
                     renderVehiclesList()
                     Toast.makeText(this, "Vehicle Updated!", Toast.LENGTH_SHORT).show()
                 }
@@ -835,6 +882,37 @@ class AssignRiderVehicleActivity : AppCompatActivity() {
                             .setPositiveButton("OK", null)
                             .show()
                     } else {
+                        val deliveryId = intent.getStringExtra("deliveryId")
+                        val pkgWeight = intent.getDoubleExtra("packageWeightKg", 1.0)
+
+                        if (selectedV != null && !deliveryId.isNullOrEmpty()) {
+                            // Cargo weight & capacity validation
+                            if (pkgWeight > selectedV.maxWeightKg) {
+                                AlertDialog.Builder(this)
+                                    .setTitle("Vehicle Capacity Exceeded!")
+                                    .setMessage("Package weight (${pkgWeight}kg) exceeds maximum capacity of ${selectedV.plateNumber} (${selectedV.maxWeightKg}kg). Please select a Delivery Van or larger capacity vehicle.")
+                                    .setPositiveButton("OK", null)
+                                    .show()
+                                return@setItems
+                            }
+
+                            // Update Firestore Delivery record
+                            val updates = mapOf(
+                                "status" to "Assigned to Rider",
+                                "assignedRiderId" to rider.riderId,
+                                "assignedRiderName" to rider.fullName,
+                                "assignedRiderContact" to rider.phone,
+                                "assignedRiderEmail" to rider.email,
+                                "assignedVehicle" to "${selectedV.vehicleId} (${selectedV.plateNumber})"
+                            )
+
+                            FirebaseFirestore.getInstance().collection("deliveries").document(deliveryId)
+                                .update(updates)
+                                .addOnSuccessListener {
+                                    Toast.makeText(this, "Delivery $deliveryId assigned to ${rider.fullName} on ${selectedV.plateNumber}!", Toast.LENGTH_LONG).show()
+                                }
+                        }
+
                         val prevV = vehiclesList.find { t -> t.vehicleId == rider.assignedVehicleId }
                         if (prevV != null) {
                             prevV.assignedRiderId = null

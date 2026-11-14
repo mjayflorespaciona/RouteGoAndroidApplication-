@@ -1,16 +1,21 @@
-# RoutGo Customer Login and Registration Walkthrough
+# DELITRACK Role-Based Security & Portal Separation Walkthrough
 
-Successfully created and improved the RoutGo Customer Login and Registration screens meeting all design and functional requirements.
+Successfully implemented role-based portal separation, navigation routing, and security guards to protect Admin screens from unauthorized Customer or Rider access.
 
 ## Changes Made
 
-### Login Screen
-- **[activity_admin_login.xml](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/res/layout/activity_admin_login.xml)**: Configured UI featuring RoutGo logo/branding, Email input field, Password input field, show/hide password toggle, login button, forgot password link, and create account prompt.
-- **[AdminLoginActivity.kt](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/java/com/example/delitrack/frontEnd/AdminLoginActivity.kt)**: Implemented input validation, Firebase authentication credential check, password reset handling, role checking, and seamless redirection to the Customer Dashboard.
+### Portal Navigation & Layouts
+- **[AdminDashboardActivity.kt](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/java/com/example/delitrack/frontEnd/AdminDashboardActivity.kt)** & **[activity_admin_dashboard.xml](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/res/layout/activity_admin_dashboard.xml)**: Created a dedicated Admin Portal featuring navigation tabs for **Orders Dispatch**, **Fleet & Rider Control**, **GIS Route Map**, **Analytics & Reports**, and **Admin Profile**.
+- **[RiderDashboardActivity.kt](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/java/com/example/delitrack/frontEnd/RiderDashboardActivity.kt)** & **[activity_rider_dashboard.xml](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/res/layout/activity_rider_dashboard.xml)**: Created a dedicated Rider Portal featuring navigation tabs for **My Jobs**, **Nasugbu-Lian Route Map**, and **Rider Profile**.
+- **[admin_nav_menu.xml](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/res/menu/admin_nav_menu.xml)** & **[rider_nav_menu.xml](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/res/menu/rider_nav_menu.xml)**: Added dedicated bottom navigation resource menus.
 
-### Registration Screen
-- **[activity_create_account.xml](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/res/layout/activity_create_account.xml)**: Added the **Confirm Password** field (`confirmPasswordField`) and show/hide toggle alongside Full Name, Email Address, Contact Number, Password, Register button, and Back to Login link.
-- **[CreateAccountActivity.kt](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/java/com/example/delitrack/frontEnd/CreateAccountActivity.kt)**: Added validation for required fields, password match verification (`password == confirmPassword`), minimum password length check (6 chars), automatic assignment of `role: "Customer"` in Firestore `users`, prevention of admin registration, and successful redirection to the Customer Dashboard.
+### Login Routing & Security Guards
+- **[AdminLoginActivity.kt](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/java/com/example/delitrack/frontEnd/AdminLoginActivity.kt)**: Configured role-based login redirection:
+  - `Customer` ➔ `DashboardActivity` (Customer Dashboard)
+  - `Rider` ➔ `RiderDashboardActivity` (Rider Portal)
+  - `Admin` ➔ `AdminDashboardActivity` (Admin Portal)
+- **[CreateAccountActivity.kt](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/java/com/example/delitrack/frontEnd/CreateAccountActivity.kt)**: Configured post-registration routing so Customers and Riders land on their respective portals.
+- **[AssignRiderVehicleActivity.kt](file:///C:/Users/Aron/Desktop/SystemRoute/System/app/src/main/java/com/example/delitrack/frontEnd/AssignRiderVehicleActivity.kt)**: Added an Admin Security Guard to verify `role == "Admin"` before allowing access. Unauthorized attempts trigger an "Access Denied" notice and finish the activity.
 
 ## Verification Results
 

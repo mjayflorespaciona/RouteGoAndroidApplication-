@@ -16,8 +16,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 class HomeFragment : Fragment() {
 
     private lateinit var tvWelcomeName: TextView
-    private lateinit var tvActiveDeliveries: TextView
+    private lateinit var tvTotalRequests: TextView
     private lateinit var tvPendingDeliveries: TextView
+    private lateinit var tvInTransitDeliveries: TextView
     private lateinit var tvCompletedDeliveries: TextView
     private lateinit var containerRecentDeliveries: LinearLayout
 
@@ -32,15 +33,16 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         tvWelcomeName = view.findViewById(R.id.tvWelcomeName)
-        tvActiveDeliveries = view.findViewById(R.id.tvActiveDeliveries)
+        tvTotalRequests = view.findViewById(R.id.tvTotalRequests)
         tvPendingDeliveries = view.findViewById(R.id.tvPendingDeliveries)
+        tvInTransitDeliveries = view.findViewById(R.id.tvInTransitDeliveries)
         tvCompletedDeliveries = view.findViewById(R.id.tvCompletedDeliveries)
         containerRecentDeliveries = view.findViewById(R.id.containerRecentDeliveries)
 
         loadCustomerProfile()
         loadCustomerDeliveries()
 
-        // Button / Card Click Listeners
+        // Button / Card Click Navigation
         view.findViewById<Button>(R.id.btnNewDelivery)?.setOnClickListener {
             startActivity(Intent(requireContext(), NewDeliveryActivity::class.java))
         }
@@ -57,11 +59,15 @@ class HomeFragment : Fragment() {
             (activity as? DashboardActivity)?.selectTab(R.id.nav_deliveries)
         }
 
-        view.findViewById<LinearLayout>(R.id.cardActiveDeliveries)?.setOnClickListener {
+        view.findViewById<LinearLayout>(R.id.cardTotalDeliveries)?.setOnClickListener {
             (activity as? DashboardActivity)?.selectTab(R.id.nav_deliveries)
         }
 
         view.findViewById<LinearLayout>(R.id.cardPendingDeliveries)?.setOnClickListener {
+            (activity as? DashboardActivity)?.selectTab(R.id.nav_deliveries)
+        }
+
+        view.findViewById<LinearLayout>(R.id.cardInTransitDeliveries)?.setOnClickListener {
             (activity as? DashboardActivity)?.selectTab(R.id.nav_deliveries)
         }
 
@@ -80,19 +86,19 @@ class HomeFragment : Fragment() {
                     if (!isAdded) return@addOnSuccessListener
                     if (document != null && document.exists()) {
                         val name = document.getString("fullName") ?: "Customer"
-                        tvWelcomeName.text = "Hello, $name!"
+                        tvWelcomeName.text = "Welcome, $name!"
                     } else {
                         val email = currentUser.email ?: "Customer"
                         val displayName = email.substringBefore("@")
-                        tvWelcomeName.text = "Hello, ${displayName.replaceFirstChar { it.uppercase() }}!"
+                        tvWelcomeName.text = "Welcome, ${displayName.replaceFirstChar { it.uppercase() }}!"
                     }
                 }
                 .addOnFailureListener {
                     if (!isAdded) return@addOnFailureListener
-                    tvWelcomeName.text = "Hello, Customer!"
+                    tvWelcomeName.text = "Welcome, Customer!"
                 }
         } else {
-            tvWelcomeName.text = "Hello, Customer!"
+            tvWelcomeName.text = "Welcome, Customer!"
         }
     }
 
@@ -106,8 +112,9 @@ class HomeFragment : Fragment() {
             .addOnSuccessListener { result ->
                 if (!isAdded) return@addOnSuccessListener
 
-                var activeCount = 0
+                var totalCount = 0
                 var pendingCount = 0
+                var inTransitCount = 0
                 var completedCount = 0
 
                 val deliveryList = mutableMapOf<String, Map<String, Any>>()
@@ -123,18 +130,20 @@ class HomeFragment : Fragment() {
                         val deliveryId = data["deliveryId"] as? String ?: document.id
                         val status = data["status"] as? String ?: "Pending"
 
+                        totalCount++
                         when (status.lowercase()) {
-                            "in transit", "dispatched", "active" -> activeCount++
+                            "in transit", "dispatched", "active" -> inTransitCount++
                             "pending" -> pendingCount++
-                            "delivered", "completed" -> completedCount++
+                            "delivered", "completed", "delivered & confirmed" -> completedCount++
                         }
 
                         deliveryList[deliveryId] = data
                     }
                 }
 
-                tvActiveDeliveries.text = activeCount.toString()
+                tvTotalRequests.text = totalCount.toString()
                 tvPendingDeliveries.text = pendingCount.toString()
+                tvInTransitDeliveries.text = inTransitCount.toString()
                 tvCompletedDeliveries.text = completedCount.toString()
 
                 // Populate recent delivery activities
@@ -170,7 +179,7 @@ class HomeFragment : Fragment() {
                                     tvStatus?.setBackgroundColor(0xFFFEF3C7.toInt())
                                     tvStatus?.setTextColor(0xFFD97706.toInt())
                                 }
-                                "delivered", "completed" -> {
+                                "delivered", "completed", "delivered & confirmed" -> {
                                     tvStatus?.setBackgroundColor(0xFFDCFCE7.toInt())
                                     tvStatus?.setTextColor(0xFF16A34A.toInt())
                                 }

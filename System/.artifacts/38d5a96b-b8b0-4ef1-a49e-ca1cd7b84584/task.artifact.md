@@ -1,4 +1,6 @@
-- [x] Task 1: Update activity_create_account.xml to add Confirm Password field and show/hide toggle
-- [x] Task 2: Update CreateAccountActivity.kt with confirm password validation, customer role assignment, and success redirection
-- [x] Task 3: Update AdminLoginActivity.kt and activity_admin_login.xml for RoutGo customer login screen branding and functionality
-- [x] Task 4: Build project and verify functionality
+- [x] Task 1: Update AndroidManifest.xml and create menu XML resources for Admin and Rider portals
+- [x] Task 2: Create AdminDashboardActivity and activity_admin_dashboard.xml
+- [x] Task 3: Create RiderDashboardActivity and activity_rider_dashboard.xml
+- [x] Task 4: Update AdminLoginActivity.kt and CreateAccountActivity.kt for role-based navigation routing
+- [x] Task 5: Add security guards in AssignRiderVehicleActivity.kt and admin screens
+- [x] Task 6: Build project and verify clean compilation and security separation

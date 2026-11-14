@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_rider_home"
+        android:icon="@android:drawable/ic_menu_compass"
+        android:title="Home" />
+    <item
+        android:id="@+id/nav_rider_assigned"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="Assigned" />
+    <item
+        android:id="@+id/nav_rider_route"
+        android:icon="@android:drawable/ic_menu_mapmode"
+        android:title="Route Map" />
+    <item
+        android:id="@+id/nav_rider_history"
+        android:icon="@android:drawable/ic_menu_recent_history"
+        android:title="History" />
+    <item
+        android:id="@+id/nav_rider_profile"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="Profile" />
+</menu>

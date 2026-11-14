@@ -1,5 +1,6 @@
 package com.example.delitrack.frontEnd
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -11,13 +12,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.delitrack.R
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class DeliveriesFragment : Fragment() {
 
@@ -58,13 +65,18 @@ class DeliveriesFragment : Fragment() {
         recyclerViewDeliveries = view.findViewById(R.id.recyclerViewDeliveries)
         tvEmptyDeliveries = view.findViewById(R.id.tvEmptyDeliveries)
 
+        val isAdmin = activity is AdminDashboardActivity
+        val isRider = activity is RiderDashboardActivity
+
         recyclerViewDeliveries.layoutManager = LinearLayoutManager(requireContext())
-        deliveriesAdapter = DeliveriesAdapter(displayedDeliveries) { delivery ->
+        deliveriesAdapter = DeliveriesAdapter(displayedDeliveries, isAdmin, isRider, { delivery ->
             val deliveryId = delivery["deliveryId"] as? String ?: ""
             val intent = Intent(requireContext(), DeliveryTrackingActivity::class.java)
             intent.putExtra("deliveryId", deliveryId)
             startActivity(intent)
-        }
+        }, { deliveryId, newStatus ->
+            updateDeliveryStatusInFirestore(deliveryId, newStatus)
+        })
         recyclerViewDeliveries.adapter = deliveriesAdapter
 
         btnFilterAll.setOnClickListener { setFilter("All") }
@@ -110,9 +122,34 @@ class DeliveriesFragment : Fragment() {
         }
     }
 
+    private fun updateDeliveryStatusInFirestore(deliveryId: String, newStatus: String) {
+        val db = FirebaseFirestore.getInstance()
+        val timestampStr = SimpleDateFormat("yyyy-MM-dd hh:mm a", Locale.getDefault()).format(Date())
+        val historyEntry = mapOf("status" to newStatus, "timestamp" to timestampStr)
+
+        val updates = mapOf(
+            "status" to newStatus,
+            "lastUpdated" to timestampStr,
+            "statusHistory" to FieldValue.arrayUnion(historyEntry)
+        )
+
+        db.collection("deliveries").document(deliveryId)
+            .update(updates)
+            .addOnSuccessListener {
+                if (!isAdded) return@addOnSuccessListener
+                Toast.makeText(requireContext(), "Delivery $deliveryId updated to $newStatus!", Toast.LENGTH_SHORT).show()
+                loadDeliveries()
+            }
+            .addOnFailureListener { e ->
+                if (!isAdded) return@addOnFailureListener
+                Toast.makeText(requireContext(), "Failed to update status: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
     private fun loadDeliveries() {
         val currentUser = FirebaseAuth.getInstance().currentUser
         val userId = currentUser?.uid ?: "default_customer"
+        val isRiderOrAdmin = activity is RiderDashboardActivity || activity is AdminDashboardActivity || currentUser?.email == "admin@delitrack.com"
         val db = FirebaseFirestore.getInstance()
 
         db.collection("deliveries")
@@ -126,11 +163,9 @@ class DeliveriesFragment : Fragment() {
                     val custId = data["customerId"] as? String ?: ""
                     val custEmail = data["customerEmail"] as? String ?: ""
 
-                    // Display only deliveries belonging to the logged-in customer (or fallback/admin if testing)
                     val isOwner = (custId == userId) || (currentUser?.email != null && custEmail.equals(currentUser.email, ignoreCase = true))
-                    val isDemoOrLegacy = custId.isEmpty() && currentUser?.email == "admin@delitrack.com"
 
-                    if (isOwner || isDemoOrLegacy) {
+                    if (isOwner || isRiderOrAdmin) {
                         allDeliveries.add(data)
                     }
                 }
@@ -192,16 +227,37 @@ class DeliveriesFragment : Fragment() {
     // RecyclerView Adapter for Deliveries
     class DeliveriesAdapter(
         private val deliveries: List<Map<String, Any>>,
-        private val onItemClick: (Map<String, Any>) -> Unit
+        private val isAdmin: Boolean,
+        private val isRider: Boolean,
+        private val onItemClick: (Map<String, Any>) -> Unit,
+        private val onStatusUpdate: (String, String) -> Unit
     ) : RecyclerView.Adapter<DeliveriesAdapter.DeliveryViewHolder>() {
 
         class DeliveryViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val tvDeliveryId: TextView = view.findViewById(R.id.tvDeliveryId)
             val tvDeliveryStatus: TextView = view.findViewById(R.id.tvDeliveryStatus)
+            val tvCustomerName: TextView = view.findViewById(R.id.tvCustomerName)
             val tvReceiverName: TextView = view.findViewById(R.id.tvReceiverName)
             val tvPickupLocation: TextView = view.findViewById(R.id.tvPickupLocation)
             val tvDeliveryDestination: TextView = view.findViewById(R.id.tvDeliveryDestination)
+            val tvPackageSummary: TextView = view.findViewById(R.id.tvPackageSummary)
             val tvDeliveryDate: TextView = view.findViewById(R.id.tvDeliveryDate)
+
+            // Admin Action Bar
+            val adminActionsLayout: LinearLayout = view.findViewById(R.id.adminActionsLayout)
+            val btnAdminConfirm: Button = view.findViewById(R.id.btnAdminConfirm)
+            val btnAdminAssign: Button = view.findViewById(R.id.btnAdminAssign)
+            val btnAdminPrepare: Button = view.findViewById(R.id.btnAdminPrepare)
+            val btnAdminReject: Button = view.findViewById(R.id.btnAdminReject)
+            val btnAdminReceipt: Button = view.findViewById(R.id.btnAdminReceipt)
+
+            // Rider Action Bar
+            val riderActionsLayout: LinearLayout = view.findViewById(R.id.riderActionsLayout)
+            val btnAcceptJob: Button = view.findViewById(R.id.btnAcceptJob)
+            val btnStartTransit: Button = view.findViewById(R.id.btnStartTransit)
+            val btnMarkDelivered: Button = view.findViewById(R.id.btnMarkDelivered)
+            val btnMarkFailed: Button = view.findViewById(R.id.btnMarkFailed)
+            val btnReportIssue: Button = view.findViewById(R.id.btnReportIssue)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeliveryViewHolder {
@@ -214,19 +270,125 @@ class DeliveriesFragment : Fragment() {
             val data = deliveries[position]
             val deliveryId = data["deliveryId"] as? String ?: "DLV-XXXX"
             val status = data["status"] as? String ?: "Pending"
-            val receiver = data["receiverName"] as? String ?: data["customerName"] as? String ?: "N/A"
-            val pickup = data["pickupAddress"] as? String ?: data["pickupLocation"] as? String ?: "Nasugbu, Batangas"
+
+            val senderName = data["senderName"] as? String ?: data["customerName"] as? String ?: "N/A"
+            val senderPhone = data["senderContact"] as? String ?: data["contactNumber"] as? String ?: ""
+            val receiver = data["receiverName"] as? String ?: "N/A"
+            val receiverPhone = data["receiverContact"] as? String ?: ""
+
+            val pickup = data["pickupLocation"] as? String ?: data["pickupAddress"] as? String ?: "Nasugbu, Batangas"
             val dest = data["destination"] as? String ?: data["deliveryAddress"] as? String ?: "Lian, Batangas"
             val date = data["dateCreated"] as? String ?: "Today"
 
+            val packageType = data["packageType"] as? String ?: "Lightweight"
+            val packageDesc = data["packageDescription"] as? String ?: "Parcel"
+            val weightKg = (data["packageWeightKg"] as? Number)?.toDouble() ?: (data["weightKg"] as? Number)?.toDouble() ?: 1.0
+
             holder.tvDeliveryId.text = deliveryId
             holder.tvDeliveryStatus.text = status
-            holder.tvReceiverName.text = "Receiver: $receiver"
+            holder.tvCustomerName.text = "Customer: $senderName ${if (senderPhone.isNotEmpty()) "($senderPhone)" else ""}"
+            holder.tvReceiverName.text = "Receiver: $receiver ${if (receiverPhone.isNotEmpty()) "($receiverPhone)" else ""}"
             holder.tvPickupLocation.text = "Pickup: $pickup"
             holder.tvDeliveryDestination.text = "Destination: $dest"
+            holder.tvPackageSummary.text = "Package: ${weightKg}kg $packageType • $packageDesc"
             holder.tvDeliveryDate.text = "Date Created: $date"
 
-            // Status badge color coding
+            // Admin Action Controls
+            if (isAdmin) {
+                holder.adminActionsLayout.visibility = View.VISIBLE
+                holder.riderActionsLayout.visibility = View.GONE
+
+                holder.btnAdminConfirm.setOnClickListener {
+                    onStatusUpdate(deliveryId, "Confirmed")
+                }
+
+                holder.btnAdminAssign.setOnClickListener {
+                    val context = holder.itemView.context
+                    val intent = Intent(context, AssignRiderVehicleActivity::class.java)
+                    intent.putExtra("deliveryId", deliveryId)
+                    intent.putExtra("packageWeightKg", weightKg)
+                    context.startActivity(intent)
+                }
+
+                holder.btnAdminPrepare.setOnClickListener {
+                    onStatusUpdate(deliveryId, "Ready for Pickup")
+                }
+
+                holder.btnAdminReject.setOnClickListener {
+                    val context = holder.itemView.context
+                    val rejectInput = EditText(context).apply { hint = "Reason for rejection" }
+
+                    AlertDialog.Builder(context)
+                        .setTitle("Reject Request ($deliveryId)")
+                        .setView(rejectInput)
+                        .setPositiveButton("Reject Request") { _, _ ->
+                            val reason = rejectInput.text.toString().trim()
+                            val finalStatus = if (reason.isNotEmpty()) "Cancelled: $reason" else "Cancelled"
+                            onStatusUpdate(deliveryId, finalStatus)
+                        }
+                        .setNegativeButton("Cancel", null)
+                        .show()
+                }
+
+                holder.btnAdminReceipt.setOnClickListener {
+                    val context = holder.itemView.context
+                    val intent = Intent(context, DeliveryReceiptActivity::class.java)
+                    intent.putExtra("deliveryId", deliveryId)
+                    context.startActivity(intent)
+                }
+            } else if (isRider) {
+                holder.adminActionsLayout.visibility = View.GONE
+                holder.riderActionsLayout.visibility = View.VISIBLE
+
+                holder.btnAcceptJob.setOnClickListener {
+                    onStatusUpdate(deliveryId, "Acknowledged")
+                }
+
+                holder.btnStartTransit.setOnClickListener {
+                    onStatusUpdate(deliveryId, "In Transit")
+                }
+
+                holder.btnMarkDelivered.setOnClickListener {
+                    onStatusUpdate(deliveryId, "Delivered")
+                }
+
+                holder.btnMarkFailed.setOnClickListener {
+                    val context = holder.itemView.context
+                    val reasonInput = EditText(context).apply { hint = "Reason for delivery failure" }
+
+                    AlertDialog.Builder(context)
+                        .setTitle("Mark Delivery Failed ($deliveryId)")
+                        .setView(reasonInput)
+                        .setPositiveButton("Submit Failure") { _, _ ->
+                            val reason = reasonInput.text.toString().trim()
+                            val finalStatus = if (reason.isNotEmpty()) "Failed: $reason" else "Delivery Failed"
+                            onStatusUpdate(deliveryId, finalStatus)
+                        }
+                        .setNegativeButton("Cancel", null)
+                        .show()
+                }
+
+                holder.btnReportIssue.setOnClickListener {
+                    val context = holder.itemView.context
+                    val issueInput = EditText(context).apply { hint = "Reason / Problem details" }
+
+                    AlertDialog.Builder(context)
+                        .setTitle("Report Delivery Issue ($deliveryId)")
+                        .setView(issueInput)
+                        .setPositiveButton("Submit Issue") { _, _ ->
+                            val reason = issueInput.text.toString().trim()
+                            val finalStatus = if (reason.isNotEmpty()) "Issue Reported: $reason" else "Issue Reported"
+                            onStatusUpdate(deliveryId, finalStatus)
+                        }
+                        .setNegativeButton("Cancel", null)
+                        .show()
+                }
+            } else {
+                holder.adminActionsLayout.visibility = View.GONE
+                holder.riderActionsLayout.visibility = View.GONE
+            }
+
+            // Status badge color coding for all 9 statuses
             when (status.lowercase()) {
                 "in transit", "dispatched", "active" -> {
                     holder.tvDeliveryStatus.setBackgroundColor(0xFFE0F2FE.toInt())
@@ -236,21 +398,25 @@ class DeliveriesFragment : Fragment() {
                     holder.tvDeliveryStatus.setBackgroundColor(0xFFFEF3C7.toInt())
                     holder.tvDeliveryStatus.setTextColor(0xFFD97706.toInt())
                 }
-                "confirmed" -> {
+                "confirmed", "acknowledged" -> {
                     holder.tvDeliveryStatus.setBackgroundColor(0xFFE8F5E9.toInt())
                     holder.tvDeliveryStatus.setTextColor(0xFF2E7D32.toInt())
+                }
+                "preparing", "ready for pickup" -> {
+                    holder.tvDeliveryStatus.setBackgroundColor(0xFFFFF7ED.toInt())
+                    holder.tvDeliveryStatus.setTextColor(0xFFEA580C.toInt())
                 }
                 "assigned to rider", "assigned" -> {
                     holder.tvDeliveryStatus.setBackgroundColor(0xFFF3E5F5.toInt())
                     holder.tvDeliveryStatus.setTextColor(0xFF7B1FA2.toInt())
                 }
-                "delivered", "completed" -> {
+                "delivered", "completed", "delivered & confirmed" -> {
                     holder.tvDeliveryStatus.setBackgroundColor(0xFFDCFCE7.toInt())
                     holder.tvDeliveryStatus.setTextColor(0xFF16A34A.toInt())
                 }
-                else -> {
-                    holder.tvDeliveryStatus.setBackgroundColor(0xFFE5E7E6.toInt())
-                    holder.tvDeliveryStatus.setTextColor(0xFF555555.toInt())
+                else -> { // Failed or Cancelled
+                    holder.tvDeliveryStatus.setBackgroundColor(0xFFFEE2E2.toInt())
+                    holder.tvDeliveryStatus.setTextColor(0xFFDC2626.toInt())
                 }
             }
 
@@ -259,6 +425,6 @@ class DeliveriesFragment : Fragment() {
             }
         }
 
-        override fun getItemCount() = deliveries.size
+        override fun getItemCount(): Int = deliveries.size
     }
 }

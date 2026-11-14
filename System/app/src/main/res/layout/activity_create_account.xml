@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:gravity="center"
-            android:text="Create RoutGo Account"
+            android:text="Create Customer Account"
             android:textColor="#111111"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -58,49 +58,10 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- Account Type Selection (Customer / Rider) -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Account Type *"
-                android:textColor="#333333"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <RadioGroup
-                android:id="@+id/roleRadioGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:orientation="horizontal">
-
-                <RadioButton
-                    android:id="@+id/radioCustomer"
-                    android:layout_width="0dp"
-                    android:layout_height="44dp"
-                    android:layout_weight="1"
-                    android:checked="true"
-                    android:paddingStart="4dp"
-                    android:text="Customer"
-                    android:textColor="#111111"
-                    android:textSize="14sp" />
-
-                <RadioButton
-                    android:id="@+id/radioRider"
-                    android:layout_width="0dp"
-                    android:layout_height="44dp"
-                    android:layout_weight="1"
-                    android:paddingStart="4dp"
-                    android:text="Rider"
-                    android:textColor="#111111"
-                    android:textSize="14sp" />
-            </RadioGroup>
-
             <!-- Full Name -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
                 android:text="Full Name *"
                 android:textColor="#333333"
                 android:textSize="13sp"
@@ -138,12 +99,12 @@
                 android:paddingHorizontal="12dp"
                 android:textSize="14sp" />
 
-            <!-- Phone Number -->
+            <!-- Contact Number -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Phone Number *"
+                android:text="Contact Number *"
                 android:textColor="#333333"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -154,7 +115,7 @@
                 android:layout_height="48dp"
                 android:layout_marginTop="4dp"
                 android:background="@android:drawable/editbox_background_normal"
-                android:hint="Enter phone number"
+                android:hint="Enter contact number"
                 android:inputType="phone"
                 android:paddingHorizontal="12dp"
                 android:textSize="14sp" />
@@ -243,14 +204,14 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Create Account Button -->
+            <!-- Register Account Button -->
             <Button
                 android:id="@+id/createAccountBtn"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="20dp"
                 android:backgroundTint="#0B4F2C"
-                android:text="Register Account"
+                android:text="Register Customer Account"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 android:textStyle="bold" />

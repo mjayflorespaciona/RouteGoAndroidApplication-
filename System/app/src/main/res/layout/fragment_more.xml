@@ -194,12 +194,13 @@
                     android:textColor="#111111"
                     android:textSize="14sp" />
 
-                <!-- Account Type (Locked to Customer) -->
+                <!-- Account Type / Rider ID (Locked) -->
                 <TextView
+                    android:id="@+id/tvRoleOrRiderIdLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="Account Role (Locked)"
+                    android:text="Account Role / Rider ID (Locked)"
                     android:textColor="#666666"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -215,14 +216,48 @@
                     android:textColor="#0B4F2C"
                     android:textSize="14sp"
                     android:textStyle="bold" />
+
+                <!-- Assigned Vehicle (Locked) -->
+                <TextView
+                    android:id="@+id/tvAssignedVehicleLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Assigned Vehicle (Admin Managed)"
+                    android:textColor="#666666"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etAssignedVehicle"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@android:drawable/editbox_background_normal"
+                    android:enabled="false"
+                    android:hint="None"
+                    android:textColor="#0B4F2C"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
             </LinearLayout>
+
+            <!-- Delivery History Action -->
+            <Button
+                android:id="@+id/btnViewDeliveryHistory"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#0B4F2C"
+                android:text="📦 View My Delivery History"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
 
             <!-- Security & Password Action -->
             <Button
                 android:id="@+id/btnChangePassword"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="10dp"
                 android:backgroundTint="#0284C7"
                 android:text="Change Password"
                 android:textColor="#FFFFFF"

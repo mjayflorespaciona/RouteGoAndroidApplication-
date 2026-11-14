@@ -33,6 +33,12 @@
             android:name=".frontEnd.DashboardActivity"
             android:exported="false" />
         <activity
+            android:name=".frontEnd.AdminDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".frontEnd.RiderDashboardActivity"
+            android:exported="false" />
+        <activity
             android:name=".frontEnd.NewDeliveryActivity"
             android:exported="false" />
         <activity
@@ -43,6 +49,15 @@
             android:exported="false" />
         <activity
             android:name=".frontEnd.DeliveryTrackingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".frontEnd.DeliveryReceiptActivity"
+            android:exported="false" />
+        <activity
+            android:name=".frontEnd.AdminCustomerManagementActivity"
+            android:exported="false" />
+        <activity
+            android:name=".frontEnd.AdminGpsMonitoringActivity"
             android:exported="false" />
     </application>
 

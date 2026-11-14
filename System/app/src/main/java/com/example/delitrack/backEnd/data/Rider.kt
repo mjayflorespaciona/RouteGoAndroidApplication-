@@ -5,5 +5,6 @@ data class Rider(
     var fullName: String,
     var phone: String,
     var assignedVehicleId: String? = null,
-    var status: String = "Available" // "Available", "On Delivery", "Off Duty"
+    var status: String = "Available", // "Available", "On Delivery", "Off Duty"
+    var email: String = ""
 )

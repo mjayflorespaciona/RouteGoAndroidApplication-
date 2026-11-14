@@ -5,5 +5,7 @@ data class Vehicle(
     var plateNumber: String,
     var vehicleType: String, // "Motorcycle", "Delivery Van"
     var assignedRiderId: String? = null,
-    var status: String = "Available" // "Available", "In Use", "Under Maintenance"
+    var status: String = "Available", // "Available", "In Use", "Under Maintenance"
+    var maxWeightKg: Double = 50.0,
+    var cargoCapacity: String = "Standard Box"
 )

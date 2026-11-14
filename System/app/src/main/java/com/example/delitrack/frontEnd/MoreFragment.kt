@@ -25,6 +25,7 @@ class MoreFragment : Fragment() {
     private lateinit var etContactNumber: EditText
     private lateinit var etAddress: EditText
     private lateinit var etAccountRole: EditText
+    private lateinit var etAssignedVehicle: EditText
     private lateinit var btnEditSaveProfile: Button
     private lateinit var btnChangePassword: Button
     private lateinit var btnLogout: Button
@@ -49,21 +50,30 @@ class MoreFragment : Fragment() {
         etContactNumber = view.findViewById(R.id.etContactNumber)
         etAddress = view.findViewById(R.id.etAddress)
         etAccountRole = view.findViewById(R.id.etAccountRole)
+        etAssignedVehicle = view.findViewById(R.id.etAssignedVehicle)
         btnEditSaveProfile = view.findViewById(R.id.btnEditSaveProfile)
         btnChangePassword = view.findViewById(R.id.btnChangePassword)
         btnLogout = view.findViewById(R.id.btnLogout)
 
-        loadCustomerProfile()
+        view.findViewById<Button>(R.id.btnViewDeliveryHistory)?.setOnClickListener {
+            if (activity is RiderDashboardActivity) {
+                (activity as RiderDashboardActivity).supportFragmentManager.beginTransaction()
+                    .replace(R.id.riderFragmentContainer, DeliveriesFragment())
+                    .commit()
+            } else {
+                (activity as? DashboardActivity)?.selectTab(R.id.nav_deliveries)
+            }
+        }
+
+        loadProfileData()
 
         btnEditSaveProfile.setOnClickListener {
             if (!isEditing) {
-                // Enter Edit Mode
                 isEditing = true
                 setFieldsEditable(true)
                 btnEditSaveProfile.text = "Save Changes"
                 Toast.makeText(requireContext(), "You can now edit your profile information", Toast.LENGTH_SHORT).show()
             } else {
-                // Save Changes Mode
                 saveProfileChanges()
             }
         }
@@ -91,7 +101,7 @@ class MoreFragment : Fragment() {
         }
     }
 
-    private fun loadCustomerProfile() {
+    private fun loadProfileData() {
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
             val db = FirebaseFirestore.getInstance()
@@ -100,10 +110,10 @@ class MoreFragment : Fragment() {
                 .addOnSuccessListener { document ->
                     if (!isAdded) return@addOnSuccessListener
                     if (document != null && document.exists()) {
-                        val name = document.getString("fullName") ?: "Customer User"
-                        val email = document.getString("email") ?: (currentUser.email ?: "customer@example.com")
+                        val name = document.getString("fullName") ?: "User"
+                        val email = document.getString("email") ?: (currentUser.email ?: "user@example.com")
                         val phone = document.getString("phone") ?: document.getString("contactNumber") ?: ""
-                        val address = document.getString("address") ?: document.getString("deliveryAddress") ?: ""
+                        val address = document.getString("address") ?: document.getString("deliveryAddress") ?: "Nasugbu / Lian"
                         val role = document.getString("role") ?: "Customer"
 
                         tvHeaderName.text = name
@@ -114,28 +124,31 @@ class MoreFragment : Fragment() {
                         etAddress.setText(address)
                         etAccountRole.setText(role)
 
-                        // Set avatar initials
                         val initials = name.split(" ").mapNotNull { it.firstOrNull()?.toString() }.take(2).joinToString("").uppercase()
-                        tvAvatarInitials.text = if (initials.isNotEmpty()) initials else "CS"
-                    } else {
-                        val email = currentUser.email ?: "customer@example.com"
-                        tvHeaderName.text = "Customer User"
-                        tvHeaderEmail.text = email
-                        etFullName.setText("Customer User")
-                        etEmail.setText(email)
-                        etAccountRole.setText("Customer")
-                        tvAvatarInitials.text = "CS"
+                        tvAvatarInitials.text = if (initials.isNotEmpty()) initials else "US"
+
+                        // If user is a Rider, fetch assigned vehicle & rider ID
+                        if (role.equals("Rider", ignoreCase = true)) {
+                            db.collection("riders").whereEqualTo("email", email)
+                                .get()
+                                .addOnSuccessListener { query ->
+                                    if (!isAdded) return@addOnSuccessListener
+                                    if (!query.isEmpty) {
+                                        val riderDoc = query.documents[0]
+                                        val rId = riderDoc.getString("riderId") ?: "RDR-RIDER"
+                                        val vehicleId = riderDoc.getString("assignedVehicleId") ?: "None"
+                                        val riderStatus = riderDoc.getString("status") ?: "Available"
+
+                                        etAccountRole.setText("Rider ID: $rId ($riderStatus)")
+                                        etAssignedVehicle.setText("Vehicle: $vehicleId")
+                                    } else {
+                                        etAssignedVehicle.setText("Assigned Vehicle: None")
+                                    }
+                                }
+                        } else {
+                            etAssignedVehicle.setText("N/A (Customer)")
+                        }
                     }
-                }
-                .addOnFailureListener {
-                    if (!isAdded) return@addOnFailureListener
-                    val email = currentUser.email ?: "customer@example.com"
-                    tvHeaderName.text = "Customer User"
-                    tvHeaderEmail.text = email
-                    etFullName.setText("Customer User")
-                    etEmail.setText(email)
-                    etAccountRole.setText("Customer")
-                    tvAvatarInitials.text = "CS"
                 }
         }
     }
@@ -144,9 +157,10 @@ class MoreFragment : Fragment() {
         etFullName.isEnabled = editable
         etContactNumber.isEnabled = editable
         etAddress.isEnabled = editable
-        // Email and Account Role remain locked for security & role integrity
+        // Locked fields: Email, Account Role, Assigned Vehicle cannot be edited by Rider/Customer
         etEmail.isEnabled = false
         etAccountRole.isEnabled = false
+        etAssignedVehicle.isEnabled = false
     }
 
     private fun saveProfileChanges() {
@@ -166,8 +180,7 @@ class MoreFragment : Fragment() {
             val updates = mapOf(
                 "fullName" to name,
                 "phone" to phone,
-                "address" to address,
-                "role" to "Customer" // Ensure role cannot be changed to Admin
+                "address" to address
             )
 
             db.collection("users").document(currentUser.uid)

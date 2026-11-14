@@ -57,8 +57,8 @@ class AdminLoginActivity : AppCompatActivity() {
 
             if (isDefaultAdmin) {
                 errorBarLabel.visibility = View.GONE
-                Toast.makeText(this, "Login Successful (Admin)!", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, DashboardActivity::class.java)
+                Toast.makeText(this, "Login Successful (Admin Portal)!", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, AdminDashboardActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
                 finish()
@@ -78,8 +78,15 @@ class AdminLoginActivity : AppCompatActivity() {
                                 .get()
                                 .addOnSuccessListener { document ->
                                     val role = document.getString("role") ?: "Customer"
-                                    Toast.makeText(this, "Login Successful ($role)!", Toast.LENGTH_SHORT).show()
-                                    val intent = Intent(this, DashboardActivity::class.java)
+                                    Toast.makeText(this, "Login Successful ($role Portal)!", Toast.LENGTH_SHORT).show()
+
+                                    val targetActivity = when (role.lowercase()) {
+                                        "admin" -> AdminDashboardActivity::class.java
+                                        "rider" -> RiderDashboardActivity::class.java
+                                        else -> DashboardActivity::class.java
+                                    }
+
+                                    val intent = Intent(this, targetActivity)
                                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                     startActivity(intent)
                                     finish()

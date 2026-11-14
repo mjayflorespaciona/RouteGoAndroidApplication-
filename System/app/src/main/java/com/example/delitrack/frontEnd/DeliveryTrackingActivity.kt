@@ -1,5 +1,6 @@
 package com.example.delitrack.frontEnd
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
@@ -15,7 +16,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.delitrack.R
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 
@@ -189,11 +189,32 @@ class DeliveryTrackingActivity : AppCompatActivity() {
         // Update 5-Step Timeline
         updateTimelineProgress(status)
 
+        val gpsLoc = data["riderGpsLocation"] as? String ?: data["riderLastLocation"] as? String
+        val gpsTime = data["riderGpsTimestamp"] as? String ?: data["lastGpsTime"] as? String ?: data["lastUpdated"] as? String
+
         // Assigned Rider Information (when available)
+        val tvRiderGpsLocation = findViewById<TextView>(R.id.tvRiderGpsLocation)
+        val tvRiderGpsTime = findViewById<TextView>(R.id.tvRiderGpsTime)
+
         if (!riderName.isNullOrEmpty()) {
             cardRiderInfo.visibility = View.VISIBLE
             tvRiderInfo.text = "Rider: $riderName ${if (!riderContact.isNullOrEmpty()) "($riderContact)" else ""}"
             tvVehicleInfo.text = "Vehicle: ${vehicleInfo ?: "Assigned Vehicle"}"
+
+            if (!gpsLoc.isNullOrEmpty()) {
+                tvRiderGpsLocation.visibility = View.VISIBLE
+                tvRiderGpsLocation.text = "GPS Location: $gpsLoc"
+
+                if (!gpsTime.isNullOrEmpty()) {
+                    tvRiderGpsTime.visibility = View.VISIBLE
+                    tvRiderGpsTime.text = "Last Updated: $gpsTime"
+                } else {
+                    tvRiderGpsTime.visibility = View.GONE
+                }
+            } else {
+                tvRiderGpsLocation.visibility = View.GONE
+                tvRiderGpsTime.visibility = View.GONE
+            }
         } else {
             cardRiderInfo.visibility = View.GONE
         }
@@ -204,6 +225,37 @@ class DeliveryTrackingActivity : AppCompatActivity() {
             tvEstimatedDate.text = "Est. Delivery: $eta"
         } else {
             cardEtaInfo.visibility = View.GONE
+        }
+
+        // Confirm Receipt Button
+        val btnConfirmReceipt = findViewById<Button>(R.id.btnConfirmReceipt)
+        if (status.equals("Delivered", ignoreCase = true)) {
+            btnConfirmReceipt.visibility = View.VISIBLE
+            btnConfirmReceipt.isEnabled = true
+            btnConfirmReceipt.text = "✓ Confirm Receipt of Parcel"
+            btnConfirmReceipt.setOnClickListener {
+                val currentDeliveryId = tvTrackingId.text.toString().trim()
+                db.collection("deliveries").document(currentDeliveryId)
+                    .update("status", "Delivered & Confirmed")
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Receipt Confirmed! Thank you for using RoutGo.", Toast.LENGTH_LONG).show()
+                    }
+            }
+        } else if (status.equals("Delivered & Confirmed", ignoreCase = true)) {
+            btnConfirmReceipt.visibility = View.VISIBLE
+            btnConfirmReceipt.isEnabled = false
+            btnConfirmReceipt.text = "✓ Receipt Confirmed by Customer"
+        } else {
+            btnConfirmReceipt.visibility = View.GONE
+        }
+
+        // View Delivery Receipt Button
+        val btnViewReceipt = findViewById<Button>(R.id.btnViewReceipt)
+        btnViewReceipt.setOnClickListener {
+            val currentDeliveryId = tvTrackingId.text.toString().trim()
+            val intent = Intent(this, DeliveryReceiptActivity::class.java)
+            intent.putExtra("deliveryId", currentDeliveryId)
+            startActivity(intent)
         }
     }
 
@@ -242,7 +294,7 @@ class DeliveryTrackingActivity : AppCompatActivity() {
             "confirmed" -> 2
             "assigned to rider", "assigned" -> 3
             "in transit", "dispatched", "active" -> 4
-            "delivered", "completed" -> 5
+            "delivered", "completed", "delivered & confirmed" -> 5
             else -> 1
         }
 

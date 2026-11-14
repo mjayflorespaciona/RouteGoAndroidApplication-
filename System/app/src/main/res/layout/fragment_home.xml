@@ -38,7 +38,7 @@
                 android:id="@+id/tvWelcomeName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hello, Customer!"
+                android:text="Welcome, Customer!"
                 android:textColor="#111111"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -72,7 +72,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Create New Delivery Button (Requirement 3) -->
+            <!-- Create New Delivery Button -->
             <Button
                 android:id="@+id/btnNewDelivery"
                 android:layout_width="match_parent"
@@ -93,7 +93,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <!-- Statistics Counters Grid (Requirements 4, 5, 6) -->
+            <!-- Statistics Counters Row: Total, Pending, In-Transit, Completed -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -101,36 +101,36 @@
                 android:baselineAligned="false"
                 android:orientation="horizontal">
 
-                <!-- Active Deliveries Counter -->
+                <!-- Total Deliveries Counter -->
                 <LinearLayout
-                    android:id="@+id/cardActiveDeliveries"
+                    android:id="@+id/cardTotalDeliveries"
                     android:layout_width="0dp"
-                    android:layout_height="88dp"
-                    android:layout_marginEnd="6dp"
+                    android:layout_height="80dp"
+                    android:layout_marginEnd="3dp"
                     android:layout_weight="1"
                     android:background="@android:drawable/dialog_holo_light_frame"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="8dp">
+                    android:padding="4dp">
 
                     <TextView
-                        android:id="@+id/tvActiveDeliveries"
+                        android:id="@+id/tvTotalRequests"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
-                        android:textColor="#0284C7"
-                        android:textSize="22sp"
+                        android:textColor="#111111"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Active"
+                        android:layout_marginTop="2dp"
+                        android:text="Total"
                         android:textColor="#666666"
-                        android:textSize="12sp"
+                        android:textSize="11sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -138,15 +138,15 @@
                 <LinearLayout
                     android:id="@+id/cardPendingDeliveries"
                     android:layout_width="0dp"
-                    android:layout_height="88dp"
-                    android:layout_marginHorizontal="3dp"
+                    android:layout_height="80dp"
+                    android:layout_marginHorizontal="2dp"
                     android:layout_weight="1"
                     android:background="@android:drawable/dialog_holo_light_frame"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="8dp">
+                    android:padding="4dp">
 
                     <TextView
                         android:id="@+id/tvPendingDeliveries"
@@ -154,16 +154,49 @@
                         android:layout_height="wrap_content"
                         android:text="0"
                         android:textColor="#D97706"
-                        android:textSize="22sp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="2dp"
                         android:text="Pending"
                         android:textColor="#666666"
-                        android:textSize="12sp"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- In-Transit Deliveries Counter -->
+                <LinearLayout
+                    android:id="@+id/cardInTransitDeliveries"
+                    android:layout_width="0dp"
+                    android:layout_height="80dp"
+                    android:layout_marginHorizontal="2dp"
+                    android:layout_weight="1"
+                    android:background="@android:drawable/dialog_holo_light_frame"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="4dp">
+
+                    <TextView
+                        android:id="@+id/tvInTransitDeliveries"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="#0284C7"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="In-Transit"
+                        android:textColor="#666666"
+                        android:textSize="11sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -171,15 +204,15 @@
                 <LinearLayout
                     android:id="@+id/cardCompletedDeliveries"
                     android:layout_width="0dp"
-                    android:layout_height="88dp"
-                    android:layout_marginStart="6dp"
+                    android:layout_height="80dp"
+                    android:layout_marginStart="3dp"
                     android:layout_weight="1"
                     android:background="@android:drawable/dialog_holo_light_frame"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="8dp">
+                    android:padding="4dp">
 
                     <TextView
                         android:id="@+id/tvCompletedDeliveries"
@@ -187,21 +220,21 @@
                         android:layout_height="wrap_content"
                         android:text="0"
                         android:textColor="#16A34A"
-                        android:textSize="22sp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="2dp"
                         android:text="Completed"
                         android:textColor="#666666"
-                        android:textSize="12sp"
+                        android:textSize="11sp"
                         android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Quick Access Cards: Track Package & My Deliveries (Requirement 8) -->
+            <!-- Quick Access Cards: Track Package & My Deliveries -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -268,7 +301,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Recent Delivery Activities Header (Requirement 7) -->
+            <!-- Recent Delivery Activities Header -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -300,63 +333,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:orientation="vertical">
-
-                <!-- Fallback static placeholder items if no deliveries loaded yet -->
-                <LinearLayout
-                    android:id="@+id/itemDlv1001"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:background="@android:drawable/dialog_holo_light_frame"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical"
-                    android:padding="12dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="DLV-1001"
-                            android:textColor="#111111"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="#E0F2FE"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="2dp"
-                            android:text="In Transit"
-                            android:textColor="#0284C7"
-                            android:textSize="11sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Nasugbu ➔ Lian"
-                        android:textColor="#555555"
-                        android:textSize="13sp" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Tap to track package"
-                        android:textColor="#888888"
-                        android:textSize="11sp" />
-                </LinearLayout>
-
-            </LinearLayout>
+                android:orientation="vertical" />
 
         </LinearLayout>
     </ScrollView>

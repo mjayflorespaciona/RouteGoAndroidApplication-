@@ -56,11 +56,11 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Section 1: Sender Information -->
+            <!-- SECTION 1: SENDER INFORMATION -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Sender Information"
+                android:text="1. Sender Information"
                 android:textColor="#0B4F2C"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -89,7 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="Contact Number *"
+                android:text="Sender Contact Number *"
                 android:textColor="#333333"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -100,7 +100,7 @@
                 android:layout_height="48dp"
                 android:layout_marginTop="4dp"
                 android:background="@android:drawable/editbox_background_normal"
-                android:hint="0917 123 4567"
+                android:hint="e.g. 0917 123 4567"
                 android:inputType="phone"
                 android:paddingHorizontal="12dp"
                 android:textSize="14sp" />
@@ -120,17 +120,79 @@
                 android:layout_height="48dp"
                 android:layout_marginTop="4dp"
                 android:background="@android:drawable/editbox_background_normal"
-                android:text="Nasugbu, Batangas"
+                android:hint="Street address / Landmark"
+                android:inputType="text"
                 android:paddingHorizontal="12dp"
                 android:textSize="14sp" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
-            <!-- Section 2: Receiver Information -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pickup Barangay *"
+                        android:textColor="#333333"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/pickupBarangayField"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@android:drawable/editbox_background_normal"
+                        android:hint="Barangay"
+                        android:inputType="text"
+                        android:paddingHorizontal="10dp"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pickup Municipality"
+                        android:textColor="#333333"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/pickupMunicipalityField"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@android:drawable/editbox_background_normal"
+                        android:text="Nasugbu, Batangas"
+                        android:inputType="text"
+                        android:paddingHorizontal="10dp"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <!-- SECTION 2: RECEIVER INFORMATION -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
-                android:text="Receiver Information"
+                android:text="2. Receiver Information"
                 android:textColor="#0B4F2C"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -159,7 +221,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="Contact Number *"
+                android:text="Receiver Contact Number *"
                 android:textColor="#333333"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -170,7 +232,7 @@
                 android:layout_height="48dp"
                 android:layout_marginTop="4dp"
                 android:background="@android:drawable/editbox_background_normal"
-                android:hint="0918 987 6543"
+                android:hint="e.g. 0918 987 6543"
                 android:inputType="phone"
                 android:paddingHorizontal="12dp"
                 android:textSize="14sp" />
@@ -190,17 +252,79 @@
                 android:layout_height="48dp"
                 android:layout_marginTop="4dp"
                 android:background="@android:drawable/editbox_background_normal"
-                android:text="Lian, Batangas"
+                android:hint="Street address / House number"
+                android:inputType="text"
                 android:paddingHorizontal="12dp"
                 android:textSize="14sp" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
-            <!-- Section 3: Package Information -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Destination Barangay *"
+                        android:textColor="#333333"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/destinationBarangayField"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@android:drawable/editbox_background_normal"
+                        android:hint="Barangay"
+                        android:inputType="text"
+                        android:paddingHorizontal="10dp"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Destination Municipality"
+                        android:textColor="#333333"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/destinationMunicipalityField"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@android:drawable/editbox_background_normal"
+                        android:text="Lian, Batangas"
+                        android:inputType="text"
+                        android:paddingHorizontal="10dp"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <!-- SECTION 3: PACKAGE INFORMATION -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
-                android:text="Package Information"
+                android:text="3. Package Information"
                 android:textColor="#0B4F2C"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -220,7 +344,7 @@
                 android:layout_height="48dp"
                 android:layout_marginTop="4dp"
                 android:background="@android:drawable/editbox_background_normal"
-                android:hint="e.g. Documents, Box, Electronics"
+                android:hint="e.g. Rice sack, Box of supplies, Small parcel"
                 android:inputType="text"
                 android:paddingHorizontal="12dp"
                 android:textSize="14sp" />
@@ -229,18 +353,121 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="Package Type"
+                android:text="Package Classification *"
+                android:textColor="#333333"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/packageTypeRadioGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radioLightweight"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:text="Lightweight"
+                    android:textSize="11sp" />
+
+                <RadioButton
+                    android:id="@+id/radioHeavy"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:text="Heavy"
+                    android:textSize="11sp" />
+
+                <RadioButton
+                    android:id="@+id/radioBulky"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:text="Bulky"
+                    android:textSize="11sp" />
+            </RadioGroup>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Weight (kg) *"
+                        android:textColor="#333333"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/packageWeightField"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@android:drawable/editbox_background_normal"
+                        android:hint="e.g. 5.0"
+                        android:inputType="numberDecimal"
+                        android:paddingHorizontal="10dp"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Number of Packages *"
+                        android:textColor="#333333"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/numberOfPackagesField"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@android:drawable/editbox_background_normal"
+                        android:text="1"
+                        android:inputType="number"
+                        android:paddingHorizontal="10dp"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Package Dimensions (L × W × H cm)"
                 android:textColor="#333333"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/packageTypeField"
+                android:id="@+id/packageDimensionsField"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="4dp"
                 android:background="@android:drawable/editbox_background_normal"
-                android:hint="e.g. Small Parcel / Standard / Fragile"
+                android:hint="e.g. 30 × 20 × 15 cm"
                 android:inputType="text"
                 android:paddingHorizontal="12dp"
                 android:textSize="14sp" />
@@ -249,87 +476,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="Delivery Notes (Optional)"
+                android:text="Special Handling Instructions"
                 android:textColor="#333333"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/deliveryNotesField"
+                android:id="@+id/specialHandlingField"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="4dp"
                 android:background="@android:drawable/editbox_background_normal"
-                android:hint="Special instructions for delivery rider"
+                android:hint="e.g. Fragile, Keep upright, Handle with care"
                 android:inputType="text"
-                android:paddingHorizontal="12dp"
-                android:textSize="14sp" />
-
-
-            <!-- Section 4: Delivery Information & Route -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:text="Delivery Information &amp; Route"
-                android:textColor="#0B4F2C"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Pickup Location"
-                android:textColor="#333333"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/pickupLocationField"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="4dp"
-                android:background="@android:drawable/editbox_background_normal"
-                android:text="Nasugbu, Batangas"
-                android:paddingHorizontal="12dp"
-                android:textSize="14sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="Destination (Route: Nasugbu - Lian)"
-                android:textColor="#333333"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/destinationField"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="4dp"
-                android:background="@android:drawable/editbox_background_normal"
-                android:text="Lian, Batangas"
-                android:paddingHorizontal="12dp"
-                android:textSize="14sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="Delivery Date"
-                android:textColor="#333333"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/deliveryDateField"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="4dp"
-                android:background="@android:drawable/editbox_background_normal"
-                android:text="Today"
                 android:paddingHorizontal="12dp"
                 android:textSize="14sp" />
 
