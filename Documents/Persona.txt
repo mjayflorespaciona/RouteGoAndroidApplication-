@@ -1,0 +1,41 @@
+DELITRACK
+USER ROLES AND RESPONSIBILITIES
+
+1. Customer
+	- Create an account and log in.
+	- Submit delivery requests.
+	- Enter sender and receiver information.
+	- Provide pickup and destination addresses.
+	- Enter package description, weight, dimensions, and quantity.
+	- Receive a unique Tracking ID and delivery receipt.
+	- Track package status.
+	- View the latest reported rider location when available.
+	- View previous and completed deliveries.
+	- Confirm package receipt, if implemented.
+
+2. Rider
+	- Log in to the Rider Dashboard.
+	- View assigned deliveries.
+	- Check customer and receiver information.
+	- View package weight, dimensions, and handling instructions.
+	- Check assigned vehicle information.
+	- Follow the designated Nasugbu–Lian route.
+	- Share GPS location during active delivery, when enabled.
+	- Update delivery status.
+	- Report delivery problems.
+	- Mark deliveries as Delivered or Failed Delivery.
+	- View personal delivery history.
+
+3. Admin
+	- Log in through an authorized Admin account.
+	- View the Admin Dashboard.
+	- Manage customer accounts.
+	- Add, edit, and manage rider accounts.
+	- Add, edit, and manage vehicle records.
+	- Review and manage delivery requests.
+	- Assign available riders and suitable vehicles.
+	- Check vehicle weight and cargo capacity.
+	- Monitor delivery progress.
+	- View the GIS map of the Nasugbu–Lian route.
+	- Monitor actual or last-reported rider GPS locations.
+	- Generate delivery and operational reports.
